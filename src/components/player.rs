@@ -45,7 +45,6 @@ pub fn player_update(
     input: Res<Input<KeyCode>>,
     time: Res<Time>,
 ) {
-
     for (mut transform, player, speed) in &mut players {
         let speed = speed.0 * time.delta_seconds();
         let mut direction = Vec2::ZERO;
@@ -68,8 +67,6 @@ pub fn player_update(
             camera_transform.translation = transform.translation;
         }
     }
-
-    
 }
 
 #[derive(Component)]
