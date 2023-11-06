@@ -6,14 +6,12 @@ pub struct TilePlugin;
 #[derive(Component)]
 pub enum TileType {
     Grass,
-    Water
+    Water,
 }
-
 
 impl Plugin for TilePlugin {
     fn build(&self, app: &mut App) {
-        app
-            .add_systems(Startup, spawn_tiles)
+        app.add_systems(Startup, spawn_tiles)
             .add_systems(Update, update_tiles);
     }
 }
@@ -54,6 +52,4 @@ pub fn spawn_tiles(mut commands: Commands, asset_server: Res<AssetServer>) {
     }
 }
 
-pub fn update_tiles(commands: Commands) {
-
-}
+pub fn update_tiles(commands: Commands) {}
