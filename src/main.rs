@@ -1,8 +1,7 @@
 use bevy::prelude::*;
 mod components;
 
-fn main()
-{
+fn main() {
     App::new()
         .insert_resource(ClearColor(Color::rgb(0.5, 0.5, 0.9)))
         .add_plugins(DefaultPlugins.set(ImagePlugin::default_nearest()))
@@ -12,8 +11,7 @@ fn main()
 }
 
 #[derive(Component)]
-struct AnimationIndices
-{
+struct AnimationIndices {
     first: usize,
     last: usize,
 }
@@ -25,8 +23,7 @@ fn setup(
     mut commands: Commands,
     asset_server: Res<AssetServer>,
     mut texture_atlases: ResMut<Assets<TextureAtlas>>,
-)
-{
+) {
     let texture_handle = asset_server.load("bun.png");
     let texture_atlas =
         TextureAtlas::from_grid(texture_handle, Vec2::new(48.0, 48.0), 4, 4, None, None);
@@ -59,20 +56,14 @@ fn animate_sprite(
         &mut AnimationTimer,
         &mut TextureAtlasSprite,
     )>,
-)
-{
-    for (indices, mut timer, mut sprite) in &mut query
-    {
+) {
+    for (indices, mut timer, mut sprite) in &mut query {
         // SPRITESHEET GOES BRRRRR
         timer.tick(time.delta());
-        if timer.just_finished()
-        {
-            sprite.index = if sprite.index == indices.last
-            {
+        if timer.just_finished() {
+            sprite.index = if sprite.index == indices.last {
                 indices.first
-            }
-            else
-            {
+            } else {
                 sprite.index + 1
             };
         }
@@ -80,8 +71,7 @@ fn animate_sprite(
 }
 
 #[derive(Component)]
-enum Direction
-{
+enum Direction {
     None,
     Up,
     Down,
@@ -90,29 +80,25 @@ enum Direction
 }
 
 // Very bad
-fn move_bun(keyboard_input: Res<Input<KeyCode>>, mut query: Query<(&mut Direction, &mut Transform)>)
-{
-    for (mut direction, mut transform) in &mut query
-    {
+fn move_bun(
+    keyboard_input: Res<Input<KeyCode>>,
+    mut query: Query<(&mut Direction, &mut Transform)>,
+) {
+    for (mut direction, mut transform) in &mut query {
         *direction = Direction::None;
-        if keyboard_input.pressed(KeyCode::Up)
-        {
+        if keyboard_input.pressed(KeyCode::Up) {
             *direction = Direction::Up;
         }
-        if keyboard_input.pressed(KeyCode::Down)
-        {
+        if keyboard_input.pressed(KeyCode::Down) {
             *direction = Direction::Down;
         }
-        if keyboard_input.pressed(KeyCode::Left)
-        {
+        if keyboard_input.pressed(KeyCode::Left) {
             *direction = Direction::Left;
         }
-        if keyboard_input.pressed(KeyCode::Right)
-        {
+        if keyboard_input.pressed(KeyCode::Right) {
             *direction = Direction::Right;
         }
-        match *direction
-        {
+        match *direction {
             Direction::Up => transform.translation.y += 1.0,
             Direction::Down => transform.translation.y -= 1.0,
             Direction::Left => transform.translation.x -= 1.0,

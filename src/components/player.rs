@@ -9,8 +9,7 @@ fn spawn_player(
     mut commands: Commands,
     // needed for loading assets
     asset_server: Res<AssetServer>,
-)
-{
+) {
     // create a new entity with whatever components we want
     commands.spawn((
         // give it a marker
@@ -36,8 +35,7 @@ fn spawn_player(
 struct Xp(u32);
 
 #[derive(Component)]
-struct Health
-{
+struct Health {
     current: u32,
     max: u32,
 }
@@ -45,12 +43,9 @@ struct Health
 fn level_up(
     // operate on anything that has Xp and Health
     mut query: Query<(&mut Xp, &mut Health)>,
-)
-{
-    for (mut xp, mut health) in query.iter_mut()
-    {
-        if xp.0 > 1000
-        {
+) {
+    for (mut xp, mut health) in query.iter_mut() {
+        if xp.0 > 1000 {
             xp.0 -= 1000;
             health.max += 25;
             health.current = health.max;
