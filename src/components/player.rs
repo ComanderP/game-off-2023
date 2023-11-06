@@ -2,9 +2,9 @@ use bevy::prelude::*;
 
 // Marker for the player
 #[derive(Component)]
-struct Player;
+pub struct Player;
 
-fn spawn_player(
+pub fn spawn_player(
     // needed for creating/removing data in the ECS World
     mut commands: Commands,
     // needed for loading assets
@@ -23,12 +23,39 @@ fn spawn_player(
         // give it a 2D sprite to render on-screen
         // (Bevy's SpriteBundle lets us add everything necessary)
         SpriteBundle {
-            texture: asset_server.load("player.png"),
+            texture: asset_server.load("man.png"),
             transform: Transform::from_xyz(25.0, 50.0, 0.0),
             // use the default values for all other components in the bundle
             ..Default::default()
         },
     ));
+}
+
+pub fn player_update(
+    mut commands: Commands,
+    mut players: Query<(&mut Transform, &Player)>,
+    input: Res<Input<KeyCode>>,
+    time: Res<Time>,
+) {
+    for (mut transform, player) in &mut players {
+        let speed = 100.0 * time.delta_seconds();
+        let mut direction = Vec2::ZERO;
+        if input.pressed(KeyCode::W) {
+            direction.y += 1.;
+        }
+        if input.pressed(KeyCode::S) {
+            direction.y -= 1.;
+        }
+        if input.pressed(KeyCode::D) {
+            direction.x += 1.;
+        }
+        if input.pressed(KeyCode::A) {
+            direction.x -= 1.;
+        }
+        let direction = direction.normalize_or_zero();
+        transform.translation.x += (speed * direction).x;
+        transform.translation.y += (speed * direction).y;
+    }
 }
 
 #[derive(Component)]

@@ -1,4 +1,5 @@
 use bevy::prelude::*;
+use components::player::*;
 mod components;
 
 fn main() {
@@ -6,6 +7,8 @@ fn main() {
         .insert_resource(ClearColor(Color::rgb(0.5, 0.5, 0.9)))
         .add_plugins(DefaultPlugins.set(ImagePlugin::default_nearest()))
         .add_systems(Startup, setup)
+        .add_systems(Startup, spawn_player)
+        .add_systems(Update, player_update)
         .add_systems(Update, (animate_sprite, move_bun))
         .run();
 }
