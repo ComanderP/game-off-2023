@@ -1,4 +1,5 @@
 use bevy::prelude::*;
+use bevy::render::camera::ScalingMode;
 use components::player::*;
 use components::tiles::*;
 mod components;
@@ -36,7 +37,13 @@ fn setup(
     let animation_indices = AnimationIndices { first: 1, last: 6 };
 
     // Spawn a camera
-    commands.spawn(Camera2dBundle::default());
+    let mut camera = Camera2dBundle::default();
+    camera.projection.scaling_mode = ScalingMode::AutoMin {
+        min_width: 256.,
+        min_height: 144.,
+    };
+
+    commands.spawn(camera);
     // Spawn a sprite with the default texture atlas sprite
     commands.spawn((
         SpriteSheetBundle {

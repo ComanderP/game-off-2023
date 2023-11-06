@@ -32,7 +32,7 @@ pub fn spawn_player(
         // give it a 2D sprite to render on-screen
         // (Bevy's SpriteBundle lets us add everything necessary)
         SpriteBundle {
-            texture: asset_server.load("man.png"),
+            texture: asset_server.load("man_transp.png"),
             transform: Transform::from_xyz(25.0, 50.0, 0.0),
             // use the default values for all other components in the bundle
             ..Default::default()
@@ -41,10 +41,12 @@ pub fn spawn_player(
 }
 
 pub fn player_update(
-    mut players: Query<(&mut Transform, &Player, &Speed)>,
+    mut players: Query<(&mut Transform, &Player, &Speed), Without<Camera>>,
+    mut camera: Query<(&Camera, &mut Transform)>,
     input: Res<Input<KeyCode>>,
     time: Res<Time>,
 ) {
+
     for (mut transform, player, speed) in &mut players {
         let speed = speed.0 * time.delta_seconds();
         let mut direction = Vec2::ZERO;
@@ -63,7 +65,12 @@ pub fn player_update(
         let direction = direction.normalize_or_zero();
         transform.translation.x += (speed * direction).x;
         transform.translation.y += (speed * direction).y;
+        for (_, mut camera_transform) in &mut camera {
+            camera_transform.translation = transform.translation;
+        }
     }
+
+    
 }
 
 #[derive(Component)]
