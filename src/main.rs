@@ -1,14 +1,15 @@
 use bevy::prelude::*;
 use components::player::*;
+use components::tiles::*;
 mod components;
 
 fn main() {
     App::new()
         .insert_resource(ClearColor(Color::rgb(0.5, 0.5, 0.9)))
         .add_plugins(DefaultPlugins.set(ImagePlugin::default_nearest()))
+        .add_plugins(PlayerPlugin)
+        .add_plugins(TilePlugin)
         .add_systems(Startup, setup)
-        .add_systems(Startup, spawn_player)
-        .add_systems(Update, player_update)
         .add_systems(Update, (animate_sprite, move_bun))
         .run();
 }
@@ -41,7 +42,7 @@ fn setup(
         SpriteSheetBundle {
             texture_atlas: texture_atlas_handle,
             sprite: TextureAtlasSprite::new(animation_indices.first),
-            transform: Transform::from_scale(Vec3::splat(6.0)),
+            transform: Transform::from_scale(Vec3::splat(1.0)),
             ..default()
         },
         // Animation data

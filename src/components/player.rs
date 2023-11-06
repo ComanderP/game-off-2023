@@ -1,6 +1,14 @@
 use bevy::prelude::*;
 
-// Marker for the player
+pub struct PlayerPlugin;
+
+impl Plugin for PlayerPlugin {
+    fn build(&self, app: &mut App) {
+        app
+            .add_systems(Startup, spawn_player)
+            .add_systems(Update, player_update);
+    }
+}
 #[derive(Component)]
 pub struct Player;
 
@@ -20,6 +28,7 @@ pub fn spawn_player(
             max: 125,
         },
         Xp(0),
+        Speed(100.),
         // give it a 2D sprite to render on-screen
         // (Bevy's SpriteBundle lets us add everything necessary)
         SpriteBundle {
@@ -32,13 +41,12 @@ pub fn spawn_player(
 }
 
 pub fn player_update(
-    mut commands: Commands,
-    mut players: Query<(&mut Transform, &Player)>,
+    mut players: Query<(&mut Transform, &Player, &Speed)>,
     input: Res<Input<KeyCode>>,
     time: Res<Time>,
 ) {
-    for (mut transform, player) in &mut players {
-        let speed = 100.0 * time.delta_seconds();
+    for (mut transform, player, speed) in &mut players {
+        let speed = speed.0 * time.delta_seconds();
         let mut direction = Vec2::ZERO;
         if input.pressed(KeyCode::W) {
             direction.y += 1.;
@@ -60,6 +68,10 @@ pub fn player_update(
 
 #[derive(Component)]
 struct Xp(u32);
+
+#[derive(Component)]
+pub struct Speed(f32);
+
 
 #[derive(Component)]
 struct Health {
