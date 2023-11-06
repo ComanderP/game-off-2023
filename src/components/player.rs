@@ -2,8 +2,14 @@ use bevy::prelude::*;
 
 pub struct PlayerPlugin;
 
+#[derive(Resource)]
+pub struct PlayerSettings {
+    camera_locked : bool,
+}
+
 impl Plugin for PlayerPlugin {
     fn build(&self, app: &mut App) {
+        app.insert_resource(PlayerSettings{camera_locked: true});
         app.add_systems(Startup, spawn_player)
             .add_systems(Update, player_update);
     }
@@ -42,6 +48,7 @@ pub fn spawn_player(
 pub fn player_update(
     mut players: Query<(&mut Transform, &Player, &Speed), Without<Camera>>,
     mut camera: Query<(&Camera, &mut Transform)>,
+    mut settings: ResMut<PlayerSettings>,
     input: Res<Input<KeyCode>>,
     time: Res<Time>,
 ) {
@@ -60,11 +67,18 @@ pub fn player_update(
         if input.pressed(KeyCode::A) {
             direction.x -= 1.;
         }
+        if input.just_pressed(KeyCode::Y) {
+            settings.camera_locked = !settings.camera_locked;
+        }
+        
         let direction = direction.normalize_or_zero();
         transform.translation.x += (speed * direction).x;
         transform.translation.y += (speed * direction).y;
-        for (_, mut camera_transform) in &mut camera {
-            camera_transform.translation = transform.translation;
+
+        if settings.camera_locked {
+            for (_, mut camera_transform) in &mut camera {
+                camera_transform.translation = transform.translation;
+            }
         }
     }
 }
