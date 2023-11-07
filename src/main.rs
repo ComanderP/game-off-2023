@@ -7,6 +7,7 @@ use components::player::*;
 use components::tiles::*;
 use components::ui::*;
 mod components;
+
 fn main() {
     App::new()
         .insert_resource(Msaa::Sample4)

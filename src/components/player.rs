@@ -1,5 +1,9 @@
 use bevy::prelude::*;
+use bevy::sprite::collide_aabb::collide;
+use super::ui::*;
 
+use super::tiles::Collider;
+const PLAYER_SIZE: Vec2 = Vec2::new(16., 30.);
 pub struct PlayerPlugin;
 
 #[derive(Resource)]
@@ -63,6 +67,7 @@ pub fn player_update(
     mut players: Query<(&mut Transform, &Player, &Speed), Without<Camera>>,
     mut camera: Query<(&Camera, &mut Transform)>,
     mut settings: ResMut<PlayerSettings>,
+    colliders: Query<(&Transform, &Collider), (Without<Player>, Without<Camera>)>,
     input: Res<Input<KeyCode>>,
     time: Res<Time>,
 ) {
@@ -86,8 +91,34 @@ pub fn player_update(
         }
 
         let direction = direction.normalize_or_zero();
-        transform.translation.x += (speed * direction).x;
-        transform.translation.y += (speed * direction).y;
+        let mut next_translation_x = transform.translation + (speed * direction).extend(0.);
+        next_translation_x.y = transform.translation.y;
+        let mut next_translation_y = transform.translation + (speed * direction).extend(0.);
+        next_translation_y.x = transform.translation.x;
+        let mut is_colliding = false;
+        let mut will_collide_x = false;
+        let mut will_collide_y = false;
+        for (collider_transform, collider) in colliders.iter() {
+            if collide(next_translation_x, PLAYER_SIZE, collider_transform.translation,collider.size).is_some() {
+                will_collide_x = true;
+            }
+            if collide(next_translation_y, PLAYER_SIZE, collider_transform.translation,collider.size).is_some() {
+                will_collide_y = true;
+            }
+            if collide(transform.translation, PLAYER_SIZE, collider_transform.translation,collider.size).is_some() {
+                is_colliding = true;
+            }
+
+        }
+        let mut next_translation = transform.translation;
+        if is_colliding || !will_collide_x {
+            next_translation.x = next_translation_x.x;
+        }
+        if is_colliding || !will_collide_y {
+            next_translation.y = next_translation_y.y;
+        }
+
+        transform.translation = next_translation;
 
         if settings.camera_locked || input.pressed(KeyCode::Space) {
             for (_, mut camera_transform) in &mut camera {

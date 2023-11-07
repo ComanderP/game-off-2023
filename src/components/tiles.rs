@@ -4,6 +4,10 @@ use rand::Rng;
 pub struct TilePlugin;
 
 #[derive(Component)]
+pub struct Collider {pub size: Vec2}
+
+
+#[derive(Component)]
 pub enum TileType {
     Grass,
     Water,
@@ -22,28 +26,25 @@ pub fn spawn_tiles(mut commands: Commands, asset_server: Res<AssetServer>) {
             let mut rng = rand::thread_rng();
 
             if rng.gen::<bool>() {
+                let mut path = "grass_var1.png";
+                if rng.gen::<i32>() % 20 == 0 {
+                    path = "grass_var2.png";
+                }
                 commands.spawn((
-                    // give it a marker
                     TileType::Grass,
-                    // give it a 2D sprite to render on-screen
-                    // (Bevy's SpriteBundle lets us add everything necessary)
                     SpriteBundle {
-                        texture: asset_server.load("grass.png"),
+                        texture: asset_server.load(path),
                         transform: Transform::from_xyz((i as f32) * 32., (j as f32) * 32., -1.0),
-                        // use the default values for all other components in the bundle
                         ..Default::default()
                     },
                 ));
             } else {
                 commands.spawn((
-                    // give it a marker
                     TileType::Water,
-                    // give it a 2D sprite to render on-screen
-                    // (Bevy's SpriteBundle lets us add everything necessary)
+                    Collider {size: Vec2::new(32., 32.)},
                     SpriteBundle {
                         texture: asset_server.load("water.png"),
                         transform: Transform::from_xyz((i as f32) * 32., (j as f32) * 32., -1.0),
-                        // use the default values for all other components in the bundle
                         ..Default::default()
                     },
                 ));
