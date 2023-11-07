@@ -1,5 +1,7 @@
 use bevy::prelude::*;
 use bevy::render::camera::ScalingMode;
+use bevy_prototype_lyon::prelude::*;
+use bevy_inspector_egui::quick::WorldInspectorPlugin;
 use components::player::*;
 use components::tiles::*;
 use components::bun::*;
@@ -7,8 +9,11 @@ use components::ui::*;
 mod components;
 fn main() {
     App::new()
+        .insert_resource(Msaa::Sample4)
         .insert_resource(ClearColor(Color::rgb(0.5, 0.5, 0.9)))
         .add_plugins(DefaultPlugins.set(ImagePlugin::default_nearest()))
+        .add_plugins(ShapePlugin)
+        .add_plugins(WorldInspectorPlugin::new())
         .add_systems(Startup, game_setup)
         .add_plugins(PlayerPlugin)
         .add_plugins(TilePlugin)
@@ -25,5 +30,20 @@ fn game_setup(mut commands: Commands) {
     };
 
     commands.spawn(camera);
+
+    let shape = shapes::RegularPolygon {
+        sides: 6,
+        feature: shapes::RegularPolygonFeature::Radius(10.0),
+        ..shapes::RegularPolygon::default()
+    };
+
+    commands.spawn((
+        ShapeBundle {
+            path: GeometryBuilder::build_as(&shape),
+            ..default()
+        },
+        Fill::color(Color::CYAN),
+        Stroke::new(Color::BLACK, 1.0),
+    ));
 }
 
