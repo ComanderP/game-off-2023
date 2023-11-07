@@ -1,10 +1,10 @@
 use bevy::prelude::*;
 use bevy::render::camera::ScalingMode;
-use bevy_prototype_lyon::prelude::*;
 use bevy_inspector_egui::quick::WorldInspectorPlugin;
+use bevy_prototype_lyon::prelude::*;
+use components::bun::*;
 use components::player::*;
 use components::tiles::*;
-use components::bun::*;
 use components::ui::*;
 mod components;
 fn main() {
@@ -46,4 +46,3 @@ fn game_setup(mut commands: Commands) {
         Stroke::new(Color::BLACK, 1.0),
     ));
 }
-

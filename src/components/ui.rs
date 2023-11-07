@@ -13,8 +13,8 @@ impl Plugin for UIPlugin {
 enum PlayerStat {
     Health,
     Experience,
-    Speed
-} 
+    Speed,
+}
 
 fn load_ui(mut commands: Commands) {
     commands
@@ -61,16 +61,23 @@ fn load_ui(mut commands: Commands) {
 
 fn update_ui(
     query: Query<(&Health, &Xp, &Speed), With<Player>>,
-    mut stats: Query<(&mut Text, &PlayerStat)>
+    mut stats: Query<(&mut Text, &PlayerStat)>,
 ) {
     let (health, xp, speed) = query.single();
     for (mut text, stat) in stats.iter_mut() {
         match stat {
-            PlayerStat::Experience => *text = Text::from_section(format!("Exp: {}/{}", xp.0, 1000), TextStyle::default()),
-            PlayerStat::Speed => *text = Text::from_section(format!("Speed: {}", speed.0), TextStyle::default()),
-            PlayerStat::Health => *text = Text::from_section(format!("Health: {}/{}", health.current, health.max), TextStyle::default()),
+            PlayerStat::Experience => {
+                *text = Text::from_section(format!("Exp: {}/{}", xp.0, 1000), TextStyle::default())
+            }
+            PlayerStat::Speed => {
+                *text = Text::from_section(format!("Speed: {}", speed.0), TextStyle::default())
+            }
+            PlayerStat::Health => {
+                *text = Text::from_section(
+                    format!("Health: {}/{}", health.current, health.max),
+                    TextStyle::default(),
+                )
+            }
         }
     }
-
-
 }

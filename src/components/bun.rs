@@ -4,12 +4,10 @@ pub struct BunPlugin;
 
 impl Plugin for BunPlugin {
     fn build(&self, app: &mut App) {
-        app
-            .add_systems(Startup, setup)
+        app.add_systems(Startup, setup)
             .add_systems(Update, (animate_sprite, move_bun));
     }
 }
-
 
 #[derive(Component)]
 struct AnimationIndices {
