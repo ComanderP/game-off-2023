@@ -3,6 +3,7 @@ use bevy::render::camera::ScalingMode;
 use components::player::*;
 use components::tiles::*;
 use components::bun::*;
+use components::ui::*;
 mod components;
 fn main() {
     App::new()
@@ -12,6 +13,7 @@ fn main() {
         .add_plugins(PlayerPlugin)
         .add_plugins(TilePlugin)
         .add_plugins(BunPlugin)
+        .add_plugins(UIPlugin)
         .run();
 }
 

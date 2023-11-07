@@ -4,18 +4,32 @@ pub struct PlayerPlugin;
 
 #[derive(Resource)]
 pub struct PlayerSettings {
-    camera_locked : bool,
+    camera_locked: bool,
 }
 
 impl Plugin for PlayerPlugin {
     fn build(&self, app: &mut App) {
-        app.insert_resource(PlayerSettings{camera_locked: true});
+        app.insert_resource(PlayerSettings {
+            camera_locked: true,
+        });
         app.add_systems(Startup, spawn_player)
-            .add_systems(Update, player_update);
+            .add_systems(Update, (player_update, level_up));
     }
 }
 #[derive(Component)]
 pub struct Player;
+
+#[derive(Component)]
+pub struct Xp(pub u32);
+
+#[derive(Component)]
+pub struct Speed(pub f32);
+
+#[derive(Component)]
+pub struct Health {
+    pub current: u32,
+    pub max: u32,
+}
 
 pub fn spawn_player(
     // needed for creating/removing data in the ECS World
@@ -70,12 +84,12 @@ pub fn player_update(
         if input.just_pressed(KeyCode::Y) {
             settings.camera_locked = !settings.camera_locked;
         }
-        
+
         let direction = direction.normalize_or_zero();
         transform.translation.x += (speed * direction).x;
         transform.translation.y += (speed * direction).y;
 
-        if settings.camera_locked {
+        if settings.camera_locked || input.pressed(KeyCode::Space) {
             for (_, mut camera_transform) in &mut camera {
                 camera_transform.translation = transform.translation;
             }
@@ -83,27 +97,16 @@ pub fn player_update(
     }
 }
 
-#[derive(Component)]
-struct Xp(u32);
-
-#[derive(Component)]
-pub struct Speed(f32);
-
-#[derive(Component)]
-struct Health {
-    current: u32,
-    max: u32,
-}
-
 fn level_up(
     // operate on anything that has Xp and Health
-    mut query: Query<(&mut Xp, &mut Health)>,
+    mut query: Query<(&mut Xp, &mut Health, &mut Speed)>,
 ) {
-    for (mut xp, mut health) in query.iter_mut() {
-        if xp.0 > 1000 {
+    for (mut xp, mut health, mut speed) in query.iter_mut() {
+        if xp.0 >= 1000 {
             xp.0 -= 1000;
             health.max += 25;
             health.current = health.max;
+            speed.0 += 10.0;
         }
     }
 }
