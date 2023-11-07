@@ -1,6 +1,6 @@
+use super::ui::*;
 use bevy::prelude::*;
 use bevy::sprite::collide_aabb::collide;
-use super::ui::*;
 
 use super::tiles::Collider;
 const PLAYER_SIZE: Vec2 = Vec2::new(16., 30.);
@@ -99,16 +99,36 @@ pub fn player_update(
         let mut will_collide_x = false;
         let mut will_collide_y = false;
         for (collider_transform, collider) in colliders.iter() {
-            if collide(next_translation_x, PLAYER_SIZE, collider_transform.translation,collider.size).is_some() {
+            if collide(
+                next_translation_x,
+                PLAYER_SIZE,
+                collider_transform.translation,
+                collider.size,
+            )
+            .is_some()
+            {
                 will_collide_x = true;
             }
-            if collide(next_translation_y, PLAYER_SIZE, collider_transform.translation,collider.size).is_some() {
+            if collide(
+                next_translation_y,
+                PLAYER_SIZE,
+                collider_transform.translation,
+                collider.size,
+            )
+            .is_some()
+            {
                 will_collide_y = true;
             }
-            if collide(transform.translation, PLAYER_SIZE, collider_transform.translation,collider.size).is_some() {
+            if collide(
+                transform.translation,
+                PLAYER_SIZE,
+                collider_transform.translation,
+                collider.size,
+            )
+            .is_some()
+            {
                 is_colliding = true;
             }
-
         }
         let mut next_translation = transform.translation;
         if is_colliding || !will_collide_x {
