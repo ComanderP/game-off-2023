@@ -3,6 +3,7 @@ use bevy::render::camera::ScalingMode;
 use bevy_inspector_egui::quick::WorldInspectorPlugin;
 use bevy_prototype_lyon::prelude::*;
 use components::bun::*;
+use components::enemy::EnemyPlugin;
 use components::player::*;
 use components::tiles::*;
 use components::ui::*;
@@ -17,6 +18,7 @@ fn main() {
         .add_plugins(WorldInspectorPlugin::new())
         .add_systems(Startup, game_setup)
         .add_plugins(PlayerPlugin)
+        .add_plugins(EnemyPlugin)
         .add_plugins(TilePlugin)
         .add_plugins(BunPlugin)
         .add_plugins(UIPlugin)
@@ -31,7 +33,7 @@ fn game_setup(mut commands: Commands) {
     };
 
     commands.spawn(camera);
-
+    /* Testing out the shapes library
     let shape = shapes::RegularPolygon {
         sides: 6,
         feature: shapes::RegularPolygonFeature::Radius(10.0),
@@ -46,4 +48,5 @@ fn game_setup(mut commands: Commands) {
         Fill::color(Color::CYAN),
         Stroke::new(Color::BLACK, 1.0),
     ));
+    */
 }

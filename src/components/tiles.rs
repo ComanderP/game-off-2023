@@ -1,11 +1,8 @@
+use super::collider::*;
 use bevy::prelude::*;
 use rand::Rng;
 
 pub struct TilePlugin;
-
-#[derive(Component)]
-pub struct Collider {pub size: Vec2}
-
 
 #[derive(Component)]
 pub enum TileType {
@@ -41,7 +38,10 @@ pub fn spawn_tiles(mut commands: Commands, asset_server: Res<AssetServer>) {
             } else {
                 commands.spawn((
                     TileType::Water,
-                    Collider {size: Vec2::new(32., 32.)},
+                    Collider {
+                        size: Vec2::new(32., 32.),
+                        active: true,
+                    },
                     SpriteBundle {
                         texture: asset_server.load("water.png"),
                         transform: Transform::from_xyz((i as f32) * 32., (j as f32) * 32., -1.0),

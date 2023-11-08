@@ -1,5 +1,6 @@
 use super::player::*;
 use bevy::prelude::*;
+use super::unit::*;
 pub struct UIPlugin;
 
 impl Plugin for UIPlugin {
