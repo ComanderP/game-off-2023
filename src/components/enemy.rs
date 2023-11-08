@@ -14,7 +14,6 @@ impl Plugin for EnemyPlugin {
 #[derive(Component)]
 pub struct Enemy;
 
-
 #[derive(Component)]
 pub struct MeleeRange(pub f32);
 
@@ -47,7 +46,6 @@ pub fn update_enemy(
     let dtime = time.delta_seconds();
     let player = players.single();
     for (mut transform, _, speed, unit) in &mut enemies {
-
         let direction = (player.0.translation - transform.translation).truncate();
 
         let direction = direction.normalize_or_zero();

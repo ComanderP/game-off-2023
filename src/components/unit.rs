@@ -1,9 +1,6 @@
 use bevy::prelude::*;
 
-use super::{
-    collider::Collider,
-    player::{Player},
-};
+use super::{collider::Collider, player::Player};
 
 #[derive(Component)]
 pub struct Unit {
