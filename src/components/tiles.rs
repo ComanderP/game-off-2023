@@ -27,6 +27,20 @@ pub fn spawn_tiles(mut commands: Commands, asset_server: Res<AssetServer>) {
                 if rng.gen::<i32>() % 20 == 0 {
                     path = "grass_var2.png";
                 }
+
+                if rng.gen::<i32>() % 25 == 0 {
+                    commands.spawn((
+                        Collider {
+                            size: Vec2::new(28.0, 28.0),
+                            active: true,
+                        },
+                        SpriteBundle {
+                            texture: asset_server.load("rock.png"),
+                            transform: Transform::from_xyz((i as f32) * 32., (j as f32) * 32., -0.5),
+                            ..Default::default()
+                        },
+                    ));
+                }
                 commands.spawn((
                     TileType::Grass,
                     SpriteBundle {
