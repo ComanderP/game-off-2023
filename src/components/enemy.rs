@@ -24,11 +24,11 @@ pub fn spawn_enemy(
 ) {
     let texture_handle = asset_server.load("feesh_man_sheet.png");
 
-    let texture_atlas = 
+    let texture_atlas =
         TextureAtlas::from_grid(texture_handle, Vec2::new(32.0, 32.0), 4, 1, None, None);
-    
+
     let texture_atlas_handle = texture_atlases.add(texture_atlas);
-    
+
     commands.spawn((
         Enemy,
         Health {
