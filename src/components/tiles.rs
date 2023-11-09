@@ -36,7 +36,11 @@ pub fn spawn_tiles(mut commands: Commands, asset_server: Res<AssetServer>) {
                         },
                         SpriteBundle {
                             texture: asset_server.load("rock.png"),
-                            transform: Transform::from_xyz((i as f32) * 32., (j as f32) * 32., -0.5),
+                            transform: Transform::from_xyz(
+                                (i as f32) * 32.,
+                                (j as f32) * 32.,
+                                -0.5,
+                            ),
                             ..Default::default()
                         },
                     ));
