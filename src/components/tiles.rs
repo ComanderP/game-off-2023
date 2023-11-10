@@ -3,7 +3,7 @@ use std::f32::consts::FRAC_PI_2;
 use crate::*;
 
 use super::collider::*;
-use bevy::prelude::{*, shape::Quad};
+use bevy::prelude::{shape::Quad, *};
 use bevy_sprite3d::*;
 use rand::Rng;
 
@@ -53,7 +53,8 @@ pub fn spawn_tiles(
                                 (j as f32) * 2. + 1.,
                             ),
                             ..default()
-                        }.bundle(&mut sprite_params),
+                        }
+                        .bundle(&mut sprite_params),
                     ));
                 }
                 commands.spawn((
@@ -62,13 +63,11 @@ pub fn spawn_tiles(
                         image: assets.grass.clone(),
                         pixels_per_metre: 16.0,
                         unlit: true,
-                        transform: Transform::from_xyz(
-                            (i as f32) * 2.,
-                            0.001,
-                            (j as f32) * 2.,
-                        ).with_rotation(Quat::from_rotation_x(-FRAC_PI_2)),
+                        transform: Transform::from_xyz((i as f32) * 2., 0.001, (j as f32) * 2.)
+                            .with_rotation(Quat::from_rotation_x(-FRAC_PI_2)),
                         ..default()
-                    }.bundle(&mut sprite_params),
+                    }
+                    .bundle(&mut sprite_params),
                 ));
             } else {
                 commands.spawn((
@@ -81,13 +80,11 @@ pub fn spawn_tiles(
                         image: assets.water.clone(),
                         pixels_per_metre: 16.0,
                         unlit: true,
-                        transform: Transform::from_xyz(
-                            (i as f32) * 2.,
-                            0.001,
-                            (j as f32) * 2.,
-                        ).with_rotation(Quat::from_rotation_x(-FRAC_PI_2)),
+                        transform: Transform::from_xyz((i as f32) * 2., 0.001, (j as f32) * 2.)
+                            .with_rotation(Quat::from_rotation_x(-FRAC_PI_2)),
                         ..default()
-                    }.bundle(&mut sprite_params),
+                    }
+                    .bundle(&mut sprite_params),
                 ));
             }
         }

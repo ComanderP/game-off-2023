@@ -32,7 +32,7 @@ pub struct Xp(pub u32);
 pub fn spawn_player(
     mut commands: Commands,
     assets: Res<MyAssets>,
-    mut sprite_params: Sprite3dParams
+    mut sprite_params: Sprite3dParams,
 ) {
     commands.spawn((
         Player,
@@ -51,7 +51,8 @@ pub fn spawn_player(
             unlit: true,
             transform: Transform::from_translation(Vec3::new(0., 1., 0.)),
             ..default()
-        }.bundle(&mut sprite_params),
+        }
+        .bundle(&mut sprite_params),
     ));
 }
 

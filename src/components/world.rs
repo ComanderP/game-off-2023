@@ -14,7 +14,6 @@ fn spawn_world(
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<StandardMaterial>>,
 ) {
-
     commands.spawn(PbrBundle {
         mesh: meshes.add(Mesh::from(shape::Plane {
             size: 32.,
@@ -33,5 +32,4 @@ fn spawn_world(
         transform: Transform::from_xyz(4.0, 8.0, 4.0),
         ..default()
     });
-
 }

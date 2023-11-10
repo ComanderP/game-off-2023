@@ -12,28 +12,31 @@ use components::player::*;
 use components::tiles::*;
 use components::ui::*;
 mod components;
+use bevy_asset_loader::prelude::*;
 use bevy_sprite3d::*;
 use components::world::*;
-use bevy_asset_loader::prelude::*;
 
 #[derive(States, Hash, Clone, PartialEq, Eq, Debug, Default)]
-enum GameState { #[default] Loading, Ready }
+enum GameState {
+    #[default]
+    Loading,
+    Ready,
+}
 
-const CAMERA_OFFSET : Vec3 = Vec3::new(0., 10., 25.);
+const CAMERA_OFFSET: Vec3 = Vec3::new(0., 10., 25.);
 
 #[derive(AssetCollection, Resource, Default)]
 struct MyAssets {
     #[asset(path = "man_transp.png")]
     player: Handle<Image>,
-    
+
     #[asset(path = "rock.png")]
     rock: Handle<Image>,
-    
+
     #[asset(path = "water.png")]
     water: Handle<Image>,
     #[asset(path = "grass_var1.png")]
     grass: Handle<Image>,
-    
 }
 
 fn main() {
@@ -44,8 +47,7 @@ fn main() {
         .add_plugins(Sprite3dPlugin)
         .add_state::<GameState>()
         .add_loading_state(
-            LoadingState::new(GameState::Loading)
-            .continue_to_state(GameState::Ready)
+            LoadingState::new(GameState::Loading).continue_to_state(GameState::Ready),
         )
         .add_collection_to_loading_state::<_, MyAssets>(GameState::Loading)
         //.add_plugins(ShapePlugin)
@@ -85,7 +87,8 @@ fn game_setup(
             fov: std::f32::consts::PI / 6.0,
             ..default()
         }),
-        transform: Transform::from_translation(CAMERA_OFFSET).with_rotation(Quat::from_rotation_x(-0.4)),
+        transform: Transform::from_translation(CAMERA_OFFSET)
+            .with_rotation(Quat::from_rotation_x(-0.4)),
         ..default()
     });
 }
