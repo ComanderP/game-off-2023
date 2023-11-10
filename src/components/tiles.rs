@@ -1,5 +1,10 @@
+use std::f32::consts::FRAC_PI_2;
+
+use crate::*;
+
 use super::collider::*;
-use bevy::prelude::*;
+use bevy::prelude::{*, shape::Quad};
+use bevy_sprite3d::*;
 use rand::Rng;
 
 pub struct TilePlugin;
@@ -12,12 +17,16 @@ pub enum TileType {
 
 impl Plugin for TilePlugin {
     fn build(&self, app: &mut App) {
-        app.add_systems(Startup, spawn_tiles)
+        app.add_systems(OnEnter(GameState::Ready), spawn_tiles)
             .add_systems(Update, update_tiles);
     }
 }
 
-pub fn spawn_tiles(mut commands: Commands, asset_server: Res<AssetServer>) {
+pub fn spawn_tiles(
+    mut commands: Commands,
+    assets: Res<MyAssets>,
+    mut sprite_params: Sprite3dParams,
+) {
     for i in -10..=10 {
         for j in -10..=10 {
             let mut rng = rand::thread_rng();
@@ -31,40 +40,54 @@ pub fn spawn_tiles(mut commands: Commands, asset_server: Res<AssetServer>) {
                 if rng.gen::<i32>() % 25 == 0 {
                     commands.spawn((
                         Collider {
-                            size: Vec2::new(28.0, 28.0),
+                            size: Vec2::new(1.8, 0.5),
                             active: true,
                         },
-                        SpriteBundle {
-                            texture: asset_server.load("rock.png"),
+                        Sprite3d {
+                            image: assets.rock.clone(),
+                            pixels_per_metre: 16.0,
+                            unlit: true,
                             transform: Transform::from_xyz(
-                                (i as f32) * 32.,
-                                (j as f32) * 32.,
-                                -0.5,
+                                (i as f32) * 2.,
+                                1.,
+                                (j as f32) * 2. + 1.,
                             ),
-                            ..Default::default()
-                        },
+                            ..default()
+                        }.bundle(&mut sprite_params),
                     ));
                 }
                 commands.spawn((
                     TileType::Grass,
-                    SpriteBundle {
-                        texture: asset_server.load(path),
-                        transform: Transform::from_xyz((i as f32) * 32., (j as f32) * 32., -1.0),
-                        ..Default::default()
-                    },
+                    Sprite3d {
+                        image: assets.grass.clone(),
+                        pixels_per_metre: 16.0,
+                        unlit: true,
+                        transform: Transform::from_xyz(
+                            (i as f32) * 2.,
+                            0.001,
+                            (j as f32) * 2.,
+                        ).with_rotation(Quat::from_rotation_x(-FRAC_PI_2)),
+                        ..default()
+                    }.bundle(&mut sprite_params),
                 ));
             } else {
                 commands.spawn((
                     TileType::Water,
                     Collider {
-                        size: Vec2::new(32., 32.),
+                        size: Vec2::new(2., 2.),
                         active: true,
                     },
-                    SpriteBundle {
-                        texture: asset_server.load("water.png"),
-                        transform: Transform::from_xyz((i as f32) * 32., (j as f32) * 32., -1.0),
-                        ..Default::default()
-                    },
+                    Sprite3d {
+                        image: assets.water.clone(),
+                        pixels_per_metre: 16.0,
+                        unlit: true,
+                        transform: Transform::from_xyz(
+                            (i as f32) * 2.,
+                            0.001,
+                            (j as f32) * 2.,
+                        ).with_rotation(Quat::from_rotation_x(-FRAC_PI_2)),
+                        ..default()
+                    }.bundle(&mut sprite_params),
                 ));
             }
         }

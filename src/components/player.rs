@@ -1,6 +1,10 @@
+use crate::*;
+
 use super::collider::*;
 use super::unit::*;
 use bevy::prelude::*;
+use bevy_sprite3d::Sprite3d;
+use bevy_sprite3d::Sprite3dParams;
 pub struct PlayerPlugin;
 
 #[derive(Resource)]
@@ -13,8 +17,10 @@ impl Plugin for PlayerPlugin {
         app.insert_resource(PlayerSettings {
             camera_locked: true,
         });
-        app.add_systems(Startup, spawn_player)
-            .add_systems(Update, (update_player, level_up));
+        app.add_systems(OnEnter(GameState::Ready), spawn_player);
+        app.add_systems(Update, update_player.run_if(in_state(GameState::Ready)));
+        //app.add_systems(Startup, spawn_player)
+        //    .add_systems(Update, (update_player, level_up));
     }
 }
 #[derive(Component)]
@@ -23,7 +29,11 @@ pub struct Player;
 #[derive(Component)]
 pub struct Xp(pub u32);
 
-pub fn spawn_player(mut commands: Commands, asset_server: Res<AssetServer>) {
+pub fn spawn_player(
+    mut commands: Commands,
+    assets: Res<MyAssets>,
+    mut sprite_params: Sprite3dParams
+) {
     commands.spawn((
         Player,
         Health {
@@ -31,15 +41,17 @@ pub fn spawn_player(mut commands: Commands, asset_server: Res<AssetServer>) {
             max: 125,
         },
         Xp(0),
-        Speed(100.),
+        Speed(3.5),
         Unit {
-            size: Vec2::new(16., 30.),
+            size: Vec2::new(0.5, 0.5),
         },
-        SpriteBundle {
-            texture: asset_server.load("man_transp.png"),
-            transform: Transform::from_xyz(0., 0., 0.),
-            ..Default::default()
-        },
+        Sprite3d {
+            image: assets.player.clone(),
+            pixels_per_metre: 16.0,
+            unlit: true,
+            transform: Transform::from_translation(Vec3::new(0., 1., 0.)),
+            ..default()
+        }.bundle(&mut sprite_params),
     ));
 }
 
@@ -53,12 +65,12 @@ pub fn update_player(
 ) {
     let dtime = time.delta_seconds();
     for (mut transform, _, speed, unit) in &mut players {
-        let mut direction = Vec2::ZERO;
+        let mut direction = Vec3::ZERO;
         if input.pressed(KeyCode::W) {
-            direction.y += 1.;
+            direction.z -= 1.;
         }
         if input.pressed(KeyCode::S) {
-            direction.y -= 1.;
+            direction.z += 1.;
         }
         if input.pressed(KeyCode::D) {
             direction.x += 1.;
@@ -77,7 +89,7 @@ pub fn update_player(
         // move camera on top of player
         if settings.camera_locked || input.pressed(KeyCode::Space) {
             for (_, mut camera_transform) in &mut camera {
-                camera_transform.translation = transform.translation;
+                camera_transform.translation = transform.translation + CAMERA_OFFSET;
             }
         }
     }
