@@ -17,7 +17,7 @@ impl Plugin for PlayerPlugin {
         app.insert_resource(PlayerSettings {
             camera_locked: true,
         });
-        app.add_systems(OnEnter(GameState::Ready), spawn_player);
+        app.add_systems(OnEnter(GameState::Spawning), spawn_player);
         app.add_systems(Update, update_player.run_if(in_state(GameState::Ready)));
         //app.add_systems(Startup, spawn_player)
         //    .add_systems(Update, (update_player, level_up));

@@ -31,7 +31,7 @@ pub fn spawn_tiles(
         for j in -10..=10 {
             let mut rng = rand::thread_rng();
 
-            if rng.gen::<bool>() {
+            if rng.gen::<i32>() % 10 != 0 {
                 let mut path = "grass_var1.png";
                 if rng.gen::<i32>() % 20 == 0 {
                     path = "grass_var2.png";

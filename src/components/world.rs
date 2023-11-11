@@ -1,3 +1,5 @@
+use crate::*;
+
 use super::collider::*;
 use super::unit::*;
 use bevy::prelude::*;
@@ -5,7 +7,7 @@ pub struct WorldPlugin;
 
 impl Plugin for WorldPlugin {
     fn build(&self, app: &mut App) {
-        app.add_systems(Startup, spawn_world);
+        app.add_systems(OnEnter(GameState::Spawning), spawn_world);
     }
 }
 

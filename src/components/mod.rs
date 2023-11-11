@@ -6,3 +6,4 @@ pub mod tiles;
 pub mod ui;
 pub mod unit;
 pub mod world;
+pub mod shop;

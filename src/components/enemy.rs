@@ -35,7 +35,7 @@ pub fn spawn_enemy(
             current: 100,
             max: 125,
         },
-        Speed(100.),
+        Speed(3.),
         Unit {
             size: Vec2::new(16., 30.),
         },

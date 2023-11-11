@@ -1,79 +1,88 @@
-use bevy::core_pipeline::clear_color::ClearColorConfig;
+mod components;
 use bevy::core_pipeline::experimental::taa::TemporalAntiAliasBundle;
+use bevy::diagnostic::FrameTimeDiagnosticsPlugin;
 use bevy::pbr::ScreenSpaceAmbientOcclusionBundle;
 use bevy::prelude::*;
+use bevy::{core_pipeline::clear_color::ClearColorConfig, diagnostic::LogDiagnosticsPlugin};
 use bevy_asset_loader::asset_collection::AssetCollection;
 use bevy_asset_loader::loading_state::LoadingState;
+use bevy_asset_loader::prelude::*;
 use bevy_inspector_egui::quick::WorldInspectorPlugin;
 use bevy_prototype_lyon::prelude::*;
-use components::bun::*;
-use components::enemy::EnemyPlugin;
-use components::player::*;
-use components::tiles::*;
-use components::ui::*;
-mod components;
-use bevy_asset_loader::prelude::*;
 use bevy_sprite3d::*;
-use components::world::*;
+use components::{bun::*, enemy::*, player::*, tiles::*, ui::*, world::*, shop::*};
 
-#[derive(States, Hash, Clone, PartialEq, Eq, Debug, Default)]
+#[derive(States, Hash, Clone, PartialEq, Eq, Debug, Default, Reflect)]
 enum GameState {
     #[default]
-    Loading,
-    Ready,
+    Loading, // loading assets from files
+    Spawning, // spawning the world 
+    Ready, // game is running 
 }
-
-const CAMERA_OFFSET: Vec3 = Vec3::new(0., 10., 25.);
 
 #[derive(AssetCollection, Resource, Default)]
 struct MyAssets {
     #[asset(path = "man_transp.png")]
     player: Handle<Image>,
-
     #[asset(path = "rock.png")]
     rock: Handle<Image>,
-
     #[asset(path = "water.png")]
     water: Handle<Image>,
     #[asset(path = "grass_var1.png")]
     grass: Handle<Image>,
+
+    #[asset(path = "feesh_man_sheet.png")]
+    merchant: Handle<Image>,
+
+    #[asset(path = "cart.png")]
+    cart: Handle<Image>,
 }
 
 fn main() {
     App::new()
         .insert_resource(Msaa::Off)
-        //.insert_resource(ClearColor(Color::rgb(0.5, 0.5, 0.9)))
         .add_plugins(DefaultPlugins.set(ImagePlugin::default_nearest()))
+        // Show diagnostics in console
+        .add_plugins(LogDiagnosticsPlugin::default())
+        .add_plugins(FrameTimeDiagnosticsPlugin::default())
+        //.add_plugins(ShapePlugin) // plugin for drawing shapes on screen
         .add_plugins(Sprite3dPlugin)
+        // define initial gamestate
         .add_state::<GameState>()
         .add_loading_state(
-            LoadingState::new(GameState::Loading).continue_to_state(GameState::Ready),
+            LoadingState::new(GameState::Loading).continue_to_state(GameState::Spawning),
         )
         .add_collection_to_loading_state::<_, MyAssets>(GameState::Loading)
-        //.add_plugins(ShapePlugin)
+        // the game world should be setup at OnEnter(GameState::Spawning)
+        // to solve entities poping in at playtime
+        .add_systems(
+            Update,
+            finish_spawning.run_if(in_state(GameState::Spawning)),
+        )
+        .add_systems(OnEnter(GameState::Ready), game_setup)
+        // systems that rely on the player being spawned should: run_if(in_state(GameState::Ready))
         .add_plugins(WorldInspectorPlugin::new())
-        .add_systems(Startup, game_setup)
+        // handle spawning and updating game components
         .add_plugins(WorldPlugin)
         .add_plugins(PlayerPlugin)
         //.add_plugins(EnemyPlugin)
         .add_plugins(TilePlugin)
+        .add_plugins(ShopPlugin)
         //.add_plugins(BunPlugin)
-        //.add_plugins(UIPlugin)
+        .add_plugins(UIPlugin)
         .run();
 }
 
-fn game_setup(
-    mut commands: Commands,
-    mut meshes: ResMut<Assets<Mesh>>,
-    mut materials: ResMut<Assets<StandardMaterial>>,
-) {
-    // commands.spawn(PbrBundle {
-    //     mesh: meshes.add(Mesh::from(shape::Cube { size: 1.0 })),
-    //     material: materials.add(Color::WHITE.into()),
-    //     transform: Transform::from_xyz(0., 1., 0.),
-    //     ..default()
-    // });
+fn finish_spawning(mut game_state: ResMut<NextState<GameState>>, input: Res<Input<KeyCode>>) {
+    if input.pressed(KeyCode::Space) {
+        game_state.set(GameState::Ready);
+    }
+}
 
+
+const CAMERA_OFFSET: Vec3 = Vec3::new(0., 10., 25.);
+
+fn game_setup(mut commands: Commands) {
     commands.spawn(Camera3dBundle {
         camera: Camera {
             hdr: true,

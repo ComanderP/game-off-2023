@@ -1,3 +1,5 @@
+use crate::*;
+
 use super::player::*;
 use super::unit::*;
 use bevy::prelude::*;
@@ -5,8 +7,8 @@ pub struct UIPlugin;
 
 impl Plugin for UIPlugin {
     fn build(&self, app: &mut App) {
-        app.add_systems(Startup, load_ui)
-            .add_systems(Update, update_ui);
+        app.add_systems(OnEnter(GameState::Spawning), load_ui)
+            .add_systems(Update, update_ui.run_if(in_state(GameState::Ready)));
     }
 }
 
