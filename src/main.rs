@@ -10,14 +10,14 @@ use bevy_asset_loader::prelude::*;
 use bevy_inspector_egui::quick::WorldInspectorPlugin;
 use bevy_prototype_lyon::prelude::*;
 use bevy_sprite3d::*;
-use components::{bun::*, enemy::*, player::*, tiles::*, ui::*, world::*, shop::*};
+use components::{bun::*, enemy::*, player::*, shop::*, tiles::*, ui::*, world::*};
 
 #[derive(States, Hash, Clone, PartialEq, Eq, Debug, Default, Reflect)]
 enum GameState {
     #[default]
     Loading, // loading assets from files
-    Spawning, // spawning the world 
-    Ready, // game is running 
+    Spawning, // spawning the world
+    Ready,    // game is running
 }
 
 #[derive(AssetCollection, Resource, Default)]
@@ -78,7 +78,6 @@ fn finish_spawning(mut game_state: ResMut<NextState<GameState>>, input: Res<Inpu
         game_state.set(GameState::Ready);
     }
 }
-
 
 const CAMERA_OFFSET: Vec3 = Vec3::new(0., 10., 25.);
 

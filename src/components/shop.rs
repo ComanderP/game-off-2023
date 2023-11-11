@@ -8,7 +8,6 @@ use bevy_sprite3d::Sprite3dParams;
 use rand::Rng;
 pub struct ShopPlugin;
 
-
 impl Plugin for ShopPlugin {
     fn build(&self, app: &mut App) {
         app.add_systems(OnEnter(GameState::Spawning), spawn_merchant);
@@ -29,7 +28,7 @@ pub fn spawn_merchant(
     let mut rng = rand::thread_rng();
     let cx = rng.gen::<i32>() % 10 - 5;
     let cy = rng.gen::<i32>() % 10 - 5;
-    
+
     commands.spawn((
         Merchant,
         Health {
@@ -61,7 +60,11 @@ pub fn spawn_merchant(
             image: assets.cart.clone(),
             pixels_per_metre: 16.0,
             unlit: true,
-            transform: Transform::from_translation(Vec3::new(cx as f32 + 2.0, 1.2, cy as f32 - 2.0)),
+            transform: Transform::from_translation(Vec3::new(
+                cx as f32 + 2.0,
+                1.2,
+                cy as f32 - 2.0,
+            )),
             ..default()
         }
         .bundle(&mut sprite_params),
@@ -83,4 +86,3 @@ pub fn update_merchant(
         unit.move_and_slide(&mut transform, direction, speed, &colliders, dtime);
     }
 }
-
