@@ -2,6 +2,7 @@ mod components;
 use bevy::core_pipeline::experimental::taa::TemporalAntiAliasBundle;
 use bevy::diagnostic::FrameTimeDiagnosticsPlugin;
 use bevy::pbr::ScreenSpaceAmbientOcclusionBundle;
+use bevy_health_bar3d::prelude::*;
 use bevy::prelude::*;
 use bevy::{core_pipeline::clear_color::ClearColorConfig, diagnostic::LogDiagnosticsPlugin};
 use bevy_asset_loader::asset_collection::AssetCollection;
@@ -10,6 +11,7 @@ use bevy_asset_loader::prelude::*;
 use bevy_inspector_egui::quick::WorldInspectorPlugin;
 use bevy_prototype_lyon::prelude::*;
 use bevy_sprite3d::*;
+use components::unit::Health;
 use components::{bun::*, enemy::*, player::*, shop::*, tiles::*, ui::*, world::*};
 
 #[derive(States, Hash, Clone, PartialEq, Eq, Debug, Default, Reflect)]
@@ -41,7 +43,9 @@ struct MyAssets {
 fn main() {
     App::new()
         .insert_resource(Msaa::Off)
+        .register_type::<Health>()
         .add_plugins(DefaultPlugins.set(ImagePlugin::default_nearest()))
+        .add_plugins(HealthBarPlugin::<Health>::default())
         // Show diagnostics in console
         .add_plugins(LogDiagnosticsPlugin::default())
         .add_plugins(FrameTimeDiagnosticsPlugin::default())
@@ -65,7 +69,7 @@ fn main() {
         // handle spawning and updating game components
         .add_plugins(WorldPlugin)
         .add_plugins(PlayerPlugin)
-        //.add_plugins(EnemyPlugin)
+        .add_plugins(EnemyPlugin)
         .add_plugins(TilePlugin)
         .add_plugins(ShopPlugin)
         //.add_plugins(BunPlugin)

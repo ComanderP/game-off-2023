@@ -1,14 +1,22 @@
+use crate::GameState;
+use crate::MyAssets;
+use bevy_health_bar3d::prelude::*;
 use super::collider::*;
 use super::player::Player;
 use super::unit::*;
+use super::ui::*;
 use bevy::prelude::*;
+use bevy::sprite;
+use bevy_sprite3d::Sprite3d;
+use bevy_sprite3d::Sprite3dParams;
 
 pub struct EnemyPlugin;
 
 impl Plugin for EnemyPlugin {
     fn build(&self, app: &mut App) {
-        app.add_systems(Startup, spawn_enemy)
-            .add_systems(Update, (update_enemy, deal_damage));
+        app.add_systems(OnEnter(GameState::Spawning), spawn_enemy)
+            .add_systems(Update, (update_enemy.run_if(in_state(GameState::Ready))
+            , deal_damage.run_if(in_state(GameState::Ready))));
     }
 }
 #[derive(Component)]
@@ -19,15 +27,10 @@ pub struct MeleeRange(pub f32);
 
 pub fn spawn_enemy(
     mut commands: Commands,
-    asset_server: Res<AssetServer>,
-    mut texture_atlases: ResMut<Assets<TextureAtlas>>,
+    assets: Res<MyAssets>,
+    mut sprite_params: Sprite3dParams,
 ) {
-    let texture_handle = asset_server.load("feesh_man_sheet.png");
 
-    let texture_atlas =
-        TextureAtlas::from_grid(texture_handle, Vec2::new(32.0, 32.0), 4, 1, None, None);
-
-    let texture_atlas_handle = texture_atlases.add(texture_atlas);
 
     commands.spawn((
         Enemy,
@@ -37,15 +40,21 @@ pub fn spawn_enemy(
         },
         Speed(3.),
         Unit {
-            size: Vec2::new(16., 30.),
+            size: Vec2::new(0.5, 0.5),
         },
-        MeleeRange(20.0),
-        SpriteSheetBundle {
-            texture_atlas: texture_atlas_handle,
-            sprite: TextureAtlasSprite::new(0),
-            transform: Transform::from_xyz(200., 200., 0.),
+        MeleeRange(2.0),
+        Sprite3d {
+            image: assets.player.clone(),
+            pixels_per_metre: 16.0,
+            unlit: true,
+            transform: Transform::from_xyz(20., 1., 20.),
             ..Default::default()
-        },
+        }.bundle(&mut sprite_params),
+        BarBundle::<Health> {
+            width: BarWidth::new(1.),
+            offset: BarOffset::new(1.),
+            ..default()
+        }
     ));
 }
 

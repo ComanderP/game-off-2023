@@ -1,6 +1,6 @@
 use bevy::prelude::*;
 use bevy_inspector_egui::prelude::*;
-
+use bevy_health_bar3d::prelude::*;
 use super::{collider::Collider, player::Player};
 
 #[derive(Component)]
@@ -12,10 +12,16 @@ pub struct Unit {
 #[reflect(Component)]
 pub struct Speed(pub f32);
 
-#[derive(Component)]
+#[derive(Component, Reflect)]
 pub struct Health {
     pub current: u32,
     pub max: u32,
+}
+
+impl Percentage for Health {
+    fn value(&self) -> f32 {
+        self.current as f32 / self.max as f32
+    }
 }
 
 impl Unit {

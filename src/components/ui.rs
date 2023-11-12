@@ -19,6 +19,11 @@ enum PlayerStat {
     Speed,
 }
 
+#[derive(Bundle)]
+pub struct HealthBar {
+    pub text: Text2dBundle,
+}
+
 fn load_ui(mut commands: Commands) {
     commands
         .spawn(NodeBundle {
