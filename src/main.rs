@@ -43,7 +43,6 @@ struct MyAssets {
     #[asset(texture_atlas(tile_size_x = 32., tile_size_y = 32., columns = 10, rows = 1))]
     #[asset(path = "player_sheet.png")]
     player_moving: Handle<TextureAtlas>,
-    
 }
 
 fn main() {

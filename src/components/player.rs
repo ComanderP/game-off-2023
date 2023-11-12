@@ -1,5 +1,3 @@
-
-
 use std::fmt::Display;
 
 use crate::*;
@@ -23,7 +21,10 @@ impl Plugin for PlayerPlugin {
         });
         app.add_systems(OnEnter(GameState::Spawning), spawn_player);
         app.add_systems(Update, update_player.run_if(in_state(GameState::Ready)));
-        app.add_systems(Update, update_player_sprite.run_if(in_state(GameState::Ready)));
+        app.add_systems(
+            Update,
+            update_player_sprite.run_if(in_state(GameState::Ready)),
+        );
         //app.add_systems(Startup, spawn_player)
         //    .add_systems(Update, (update_player, level_up));
     }
@@ -81,7 +82,10 @@ pub fn spawn_player(
 }
 
 pub fn update_player(
-    mut players: Query<(&mut Transform, &Player, &Speed, &Unit, &mut AnimationState), Without<Camera>>,
+    mut players: Query<
+        (&mut Transform, &Player, &Speed, &Unit, &mut AnimationState),
+        Without<Camera>,
+    >,
     mut camera: Query<(&Camera, &mut Transform)>,
     mut settings: ResMut<PlayerSettings>,
     colliders: Query<(&Transform, &Collider), (Without<Unit>, Without<Camera>)>,
@@ -146,8 +150,13 @@ pub fn update_player(
 }
 
 pub fn update_player_sprite(
-    mut players: Query<(&Player, &mut AnimationState, &mut AtlasSprite3dComponent, &mut AnimationTimer)>,
-    time: Res<Time>
+    mut players: Query<(
+        &Player,
+        &mut AnimationState,
+        &mut AtlasSprite3dComponent,
+        &mut AnimationTimer,
+    )>,
+    time: Res<Time>,
 ) {
     for (_, state, mut atlas, mut timer) in &mut players {
         timer.tick(time.delta());
