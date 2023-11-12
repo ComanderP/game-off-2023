@@ -52,7 +52,7 @@ pub fn spawn_merchant(
             width: BarWidth::new(1.),
             offset: BarOffset::new(2.),
             ..default()
-        }
+        },
     ));
 
     commands.spawn((
