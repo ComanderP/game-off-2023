@@ -1,7 +1,7 @@
-use bevy::prelude::*;
-use bevy_inspector_egui::prelude::*;
-use bevy_health_bar3d::prelude::*;
 use super::{collider::Collider, player::Player};
+use bevy::prelude::*;
+use bevy_health_bar3d::prelude::*;
+use bevy_inspector_egui::prelude::*;
 
 #[derive(Component)]
 pub struct Unit {

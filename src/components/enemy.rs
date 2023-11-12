@@ -1,12 +1,12 @@
-use crate::GameState;
-use crate::MyAssets;
-use bevy_health_bar3d::prelude::*;
 use super::collider::*;
 use super::player::Player;
-use super::unit::*;
 use super::ui::*;
+use super::unit::*;
+use crate::GameState;
+use crate::MyAssets;
 use bevy::prelude::*;
 use bevy::sprite;
+use bevy_health_bar3d::prelude::*;
 use bevy_sprite3d::Sprite3d;
 use bevy_sprite3d::Sprite3dParams;
 
@@ -15,8 +15,13 @@ pub struct EnemyPlugin;
 impl Plugin for EnemyPlugin {
     fn build(&self, app: &mut App) {
         app.add_systems(OnEnter(GameState::Spawning), spawn_enemy)
-            .add_systems(Update, (update_enemy.run_if(in_state(GameState::Ready))
-            , deal_damage.run_if(in_state(GameState::Ready))));
+            .add_systems(
+                Update,
+                (
+                    update_enemy.run_if(in_state(GameState::Ready)),
+                    deal_damage.run_if(in_state(GameState::Ready)),
+                ),
+            );
     }
 }
 #[derive(Component)]
@@ -30,8 +35,6 @@ pub fn spawn_enemy(
     assets: Res<MyAssets>,
     mut sprite_params: Sprite3dParams,
 ) {
-
-
     commands.spawn((
         Enemy,
         Health {
@@ -49,12 +52,13 @@ pub fn spawn_enemy(
             unlit: true,
             transform: Transform::from_xyz(20., 1., 20.),
             ..Default::default()
-        }.bundle(&mut sprite_params),
+        }
+        .bundle(&mut sprite_params),
         BarBundle::<Health> {
             width: BarWidth::new(1.),
             offset: BarOffset::new(1.),
             ..default()
-        }
+        },
     ));
 }
 
