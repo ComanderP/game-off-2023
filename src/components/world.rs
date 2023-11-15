@@ -7,7 +7,7 @@ use bevy::prelude::{shape::Quad, *};
 use bevy_sprite3d::*;
 use rand::Rng;
 
-pub struct TilePlugin;
+pub struct WorldPlugin;
 
 #[derive(Component)]
 pub enum TileType {
@@ -15,7 +15,7 @@ pub enum TileType {
     Water,
 }
 
-impl Plugin for TilePlugin {
+impl Plugin for WorldPlugin {
     fn build(&self, app: &mut App) {
         app.add_systems(OnEnter(GameState::Ready), spawn_tiles)
             .add_systems(Update, update_tiles);
@@ -27,7 +27,6 @@ pub fn spawn_tiles(
     assets: Res<MyAssets>,
     mut sprite_params: Sprite3dParams,
 ) {
-    // spawn 21 x 21 tile region 
     for i in -10..=10 {
         for j in -10..=10 {
             let mut rng = rand::thread_rng();

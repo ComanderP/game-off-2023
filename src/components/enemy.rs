@@ -91,7 +91,7 @@ fn deal_damage(
             } else {
                 player.2.current = 0;
             }
-            // info!("Player hit")
+            info!("Player hit")
         }
     }
 }

@@ -37,10 +37,8 @@ pub struct AnimationTimer(Timer);
 
 #[derive(Component)]
 pub enum AnimationState {
-    IdleLeft,
-    IdleRight,
-    MovingLeft,
-    MovingRight,
+    Idle,
+    Moving,
 }
 
 #[derive(Component)]
@@ -57,7 +55,7 @@ pub fn spawn_player(
             current: 100,
             max: 125,
         },
-        AnimationState::IdleLeft,
+        AnimationState::Idle,
         AnimationTimer(Timer::from_seconds(0.1, TimerMode::Repeating)),
         Xp(0),
         Speed(3.5),
@@ -97,43 +95,28 @@ pub fn update_player(
         let mut direction = Vec3::ZERO;
         if input.pressed(KeyCode::W) {
             direction.z -= 1.;
+            // transform.rotate(Quat::from_rotation_y(2. * std::f32::consts::PI * dtime));
         }
         if input.pressed(KeyCode::S) {
             direction.z += 1.;
         }
         if input.pressed(KeyCode::D) {
             direction.x += 1.;
+            transform.rotation = Quat::from_xyzw(0., 1., 0., 0.);
         }
         if input.pressed(KeyCode::A) {
             direction.x -= 1.;
+            transform.rotation = Quat::from_xyzw(0., 0., 0., 1.);
         }
         if input.just_pressed(KeyCode::Y) {
             settings.camera_locked = !settings.camera_locked;
         }
 
         // detect changes in X-axis movement
-        if direction.x == 1. {
-            *state = AnimationState::MovingRight;
-        } else if direction.x == -1. {
-            *state = AnimationState::MovingLeft;
-        } else if direction == Vec3::ZERO {
-            let next_state = match *state {
-                AnimationState::MovingLeft => AnimationState::IdleLeft,
-                AnimationState::MovingRight => AnimationState::IdleRight,
-                AnimationState::IdleLeft => AnimationState::IdleLeft,
-                AnimationState::IdleRight => AnimationState::IdleRight,
-            };
-
-            *state = next_state;
+        if direction == Vec3::ZERO {
+            *state = AnimationState::Idle;
         } else {
-            let next_state = match *state {
-                AnimationState::MovingLeft => AnimationState::MovingLeft,
-                AnimationState::MovingRight => AnimationState::MovingRight,
-                AnimationState::IdleLeft => AnimationState::MovingLeft,
-                AnimationState::IdleRight => AnimationState::MovingRight,
-            };
-
-            *state = next_state;
+            *state = AnimationState::Moving;
         }
         let direction = direction.normalize_or_zero();
 
@@ -163,13 +146,9 @@ pub fn update_player_sprite(
             continue;
         }
         match *state {
-            AnimationState::IdleLeft => atlas.index = 0,
-            AnimationState::IdleRight => atlas.index = 1,
-            AnimationState::MovingLeft => {
+            AnimationState::Idle => atlas.index = 0,
+            AnimationState::Moving => {
                 atlas.index = (atlas.index + 1) % 4 + 2;
-            }
-            AnimationState::MovingRight => {
-                atlas.index = (atlas.index + 1) % 4 + 6;
             }
         }
     }
