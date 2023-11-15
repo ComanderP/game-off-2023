@@ -75,7 +75,7 @@ pub fn spawn_player(
         .bundle(&mut sprite_params),
         BarBundle::<Health> {
             width: BarWidth::new(1.),
-            offset: BarOffset::new(2.),
+            offset: BarOffset::new(1.),
             ..default()
         },
     ));
@@ -135,7 +135,6 @@ pub fn update_player(
 
             *state = next_state;
         }
-
         let direction = direction.normalize_or_zero();
 
         unit.move_and_slide(&mut transform, direction, speed, &colliders, dtime);

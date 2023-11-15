@@ -12,7 +12,7 @@ use bevy_inspector_egui::quick::WorldInspectorPlugin;
 use bevy_prototype_lyon::prelude::*;
 use bevy_sprite3d::*;
 use components::unit::Health;
-use components::{bun::*, enemy::*, player::*, shop::*, tiles::*, ui::*, world::*};
+use components::{bun::*, enemy::*, player::*, shop::*, tiles::*, ui::*};
 
 #[derive(States, Hash, Clone, PartialEq, Eq, Debug, Default, Reflect)]
 enum GameState {
@@ -72,7 +72,6 @@ fn main() {
         // systems that rely on the player being spawned should: run_if(in_state(GameState::Ready))
         .add_plugins(WorldInspectorPlugin::new())
         // handle spawning and updating game components
-        .add_plugins(WorldPlugin)
         .add_plugins(PlayerPlugin)
         .add_plugins(EnemyPlugin)
         .add_plugins(TilePlugin)

@@ -1,11 +1,9 @@
 use super::collider::*;
 use super::player::Player;
-use super::ui::*;
 use super::unit::*;
 use crate::GameState;
 use crate::MyAssets;
 use bevy::prelude::*;
-use bevy::sprite;
 use bevy_health_bar3d::prelude::*;
 use bevy_sprite3d::Sprite3d;
 use bevy_sprite3d::Sprite3dParams;
@@ -71,11 +69,13 @@ pub fn update_enemy(
     let dtime = time.delta_seconds();
     let player = players.single();
     for (mut transform, _, speed, unit) in &mut enemies {
-        let direction = (player.0.translation - transform.translation);
-
+        let direction = player.0.translation - transform.translation;
+        if direction.length() <= 1.0 {
+            continue;
+        }
         let direction = direction.normalize_or_zero();
-
         unit.move_and_slide(&mut transform, direction, speed, &colliders, dtime);
+   
     }
 }
 

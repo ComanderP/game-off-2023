@@ -27,6 +27,7 @@ pub fn spawn_tiles(
     assets: Res<MyAssets>,
     mut sprite_params: Sprite3dParams,
 ) {
+    // spawn 21 x 21 tile region 
     for i in -10..=10 {
         for j in -10..=10 {
             let mut rng = rand::thread_rng();

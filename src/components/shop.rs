@@ -50,7 +50,7 @@ pub fn spawn_merchant(
         .bundle(&mut sprite_params),
         BarBundle::<Health> {
             width: BarWidth::new(1.),
-            offset: BarOffset::new(2.),
+            offset: BarOffset::new(1.),
             ..default()
         },
     ));
