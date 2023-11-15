@@ -12,7 +12,7 @@ use bevy_inspector_egui::quick::WorldInspectorPlugin;
 use bevy_prototype_lyon::prelude::*;
 use bevy_sprite3d::*;
 use components::unit::Health;
-use components::{bun::*, enemy::*, player::*, shop::*, ui::*, world::*, world::*};
+use components::{bun::*, enemy::*, player::*, shop::*, ui::*, world::*};
 
 #[derive(States, Hash, Clone, PartialEq, Eq, Debug, Default, Reflect)]
 enum GameState {

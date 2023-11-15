@@ -5,3 +5,4 @@ pub mod player;
 pub mod shop;
 pub mod ui;
 pub mod unit;
+pub mod world;
