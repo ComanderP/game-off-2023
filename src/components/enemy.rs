@@ -71,7 +71,7 @@ pub fn update_enemy(
     let dtime = time.delta_seconds();
     let player = players.single();
     for (mut transform, _, speed, unit) in &mut enemies {
-        let direction = (player.0.translation - transform.translation);
+        let direction = player.0.translation - transform.translation;
 
         let direction = direction.normalize_or_zero();
 
@@ -91,7 +91,7 @@ fn deal_damage(
             } else {
                 player.2.current = 0;
             }
-            // info!("Player hit")
+            info!("Player hit")
         }
     }
 }
