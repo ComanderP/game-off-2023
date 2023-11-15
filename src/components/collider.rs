@@ -13,12 +13,13 @@ impl Collider {
         other_translate: Vec3,
         other_size: Vec2,
     ) -> bool {
-        return self.active && collide(
-            self_translate.xz().extend(0.),
-            self.size,
-            other_translate.xz().extend(0.),
-            other_size,
-        )
-        .is_some();
+        return self.active
+            && collide(
+                self_translate.xz().extend(0.),
+                self.size,
+                other_translate.xz().extend(0.),
+                other_size,
+            )
+            .is_some();
     }
 }
