@@ -10,15 +10,12 @@ use bevy_sprite3d::Sprite3dParams;
 pub struct PlayerPlugin;
 
 #[derive(Resource)]
-pub struct PlayerSettings
-{
+pub struct PlayerSettings {
     camera_locked: bool,
 }
 
-impl Plugin for PlayerPlugin
-{
-    fn build(&self, app: &mut App)
-    {
+impl Plugin for PlayerPlugin {
+    fn build(&self, app: &mut App) {
         app.insert_resource(PlayerSettings {
             camera_locked: true,
         });
@@ -39,8 +36,7 @@ pub struct Player;
 pub struct AnimationTimer(Timer);
 
 #[derive(Component)]
-pub enum AnimationState
-{
+pub enum AnimationState {
     Idle,
     Moving,
 }
@@ -52,8 +48,7 @@ pub fn spawn_player(
     mut commands: Commands,
     assets: Res<MyAssets>,
     mut sprite_params: Sprite3dParams,
-)
-{
+) {
     commands.spawn((
         Player,
         Health {
@@ -94,43 +89,33 @@ pub fn update_player(
     colliders: Query<(&Transform, &Collider), (Without<Unit>, Without<Camera>)>,
     input: Res<Input<KeyCode>>,
     time: Res<Time>,
-)
-{
+) {
     let dtime = time.delta_seconds();
-    for (mut transform, _, speed, unit, mut state) in &mut players
-    {
+    for (mut transform, _, speed, unit, mut state) in &mut players {
         let mut direction = Vec3::ZERO;
-        if input.pressed(KeyCode::W)
-        {
+        if input.pressed(KeyCode::W) {
             direction.z -= 1.;
             // transform.rotate(Quat::from_rotation_y(2. * std::f32::consts::PI * dtime));
         }
-        if input.pressed(KeyCode::S)
-        {
+        if input.pressed(KeyCode::S) {
             direction.z += 1.;
         }
-        if input.pressed(KeyCode::D)
-        {
+        if input.pressed(KeyCode::D) {
             direction.x += 1.;
             transform.rotation = Quat::from_xyzw(0., 1., 0., 0.);
         }
-        if input.pressed(KeyCode::A)
-        {
+        if input.pressed(KeyCode::A) {
             direction.x -= 1.;
             transform.rotation = Quat::from_xyzw(0., 0., 0., 1.);
         }
-        if input.just_pressed(KeyCode::Y)
-        {
+        if input.just_pressed(KeyCode::Y) {
             settings.camera_locked = !settings.camera_locked;
         }
 
         // detect changes in X-axis movement
-        if direction == Vec3::ZERO
-        {
+        if direction == Vec3::ZERO {
             *state = AnimationState::Idle;
-        }
-        else
-        {
+        } else {
             *state = AnimationState::Moving;
         }
 
@@ -139,10 +124,8 @@ pub fn update_player(
         unit.move_and_slide(&mut transform, direction, speed, &colliders, dtime);
 
         // move camera on top of player
-        if settings.camera_locked || input.pressed(KeyCode::Space)
-        {
-            for (_, mut camera_transform) in &mut camera
-            {
+        if settings.camera_locked || input.pressed(KeyCode::Space) {
+            for (_, mut camera_transform) in &mut camera {
                 camera_transform.translation = transform.translation + CAMERA_OFFSET;
             }
         }
@@ -157,20 +140,15 @@ pub fn update_player_sprite(
         &mut AnimationTimer,
     )>,
     time: Res<Time>,
-)
-{
-    for (_, state, mut atlas, mut timer) in &mut players
-    {
+) {
+    for (_, state, mut atlas, mut timer) in &mut players {
         timer.tick(time.delta());
-        if !timer.just_finished()
-        {
+        if !timer.just_finished() {
             continue;
         }
-        match *state
-        {
+        match *state {
             AnimationState::Idle => atlas.index = 0,
-            AnimationState::Moving =>
-            {
+            AnimationState::Moving => {
                 atlas.index = (atlas.index + 1) % 4 + 2;
             }
         }
@@ -180,12 +158,9 @@ pub fn update_player_sprite(
 fn level_up(
     // operate on anything that has Xp and Health
     mut query: Query<(&mut Xp, &mut Health, &mut Speed)>,
-)
-{
-    for (mut xp, mut health, mut speed) in query.iter_mut()
-    {
-        if xp.0 >= 1000
-        {
+) {
+    for (mut xp, mut health, mut speed) in query.iter_mut() {
+        if xp.0 >= 1000 {
             xp.0 -= 1000;
             health.max += 25;
             health.current = health.max;
