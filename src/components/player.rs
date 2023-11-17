@@ -135,7 +135,6 @@ pub fn update_player(
         }
         let direction = direction.normalize_or_zero();
 
-
         if input.just_pressed(KeyCode::E) && attack_timer.0.elapsed_secs() == 0.0 {
             info!("Test");
             *state = AnimationState::Attacking;
