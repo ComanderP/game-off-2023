@@ -23,7 +23,7 @@ impl Plugin for PlayerPlugin {
         app.add_systems(Update, update_player.run_if(in_state(GameState::Ready)));
         app.add_systems(
             Update,
-            update_player_sprite.run_if(in_state(GameState::Ready)),
+            (update_player_sprite, swipe_attack).run_if(in_state(GameState::Ready)),
         );
         app.add_systems(Update, update_slash.run_if(in_state(GameState::Ready)));
         //app.add_systems(Startup, spawn_player)
@@ -68,6 +68,7 @@ pub fn spawn_player(
         StateTimer(Timer::from_seconds(0.3, TimerMode::Once)),
         Xp(0),
         Speed(3.5),
+        Damage(10),
         Unit {
             size: Vec2::new(0.5, 0.5),
         },
@@ -226,6 +227,46 @@ fn level_up(
             speed.0 += 10.0;
         }
     }
+}
+
+fn swipe_attack(
+    player: Query<(&Player, &Transform, &Damage)>,
+    mut enemies: Query<(&Enemy, &mut Health, &mut Transform), Without<Player>>,
+    input: Res<Input<KeyCode>>,
+) {
+    let player = player.single();
+    if input.just_pressed(KeyCode::Space) {
+        for (_, mut enemy_health, mut enemy_transform) in enemies.iter_mut() {
+            let player_transform = player.1;
+
+            let player_direction = player_transform.rotation.mul_vec3(Vec3::new(-1., 0., 0.));
+            info!("Player direction: {}", player_direction);
+
+            let distance_to_enemy = enemy_transform.translation - player_transform.translation;
+            info!("Distance to enemey: {}", distance_to_enemy);
+
+            let angle = player_direction.dot(distance_to_enemy.normalize_or_zero());
+            info!("Angle: {}", angle);
+
+            if angle > 0.5 && distance_to_enemy.length() < 3.0 {
+                let player_damage = player.2 .0;
+                info!("Damage!");
+                if enemy_health.current < player_damage {
+                    info!("Enemy dead!");
+                    enemy_health.current = 0;
+                } else {
+                    enemy_health.current -= player_damage;
+                }
+                knockback_enemy(&mut enemy_transform, player_transform);
+            }
+        }
+    }
+}
+
+fn knockback_enemy(enemy_transform: &mut Transform, player_transform: &Transform) {
+    let direction = enemy_transform.translation - player_transform.translation;
+    let direction = direction.normalize_or_zero();
+    enemy_transform.translation += direction
 }
 
 fn update_slash(mut commands: Commands,mut slashes: Query<(Entity, &mut Slash, &mut AtlasSprite3dComponent)>, time: Res<Time>) {
