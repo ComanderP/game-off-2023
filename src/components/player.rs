@@ -25,6 +25,7 @@ impl Plugin for PlayerPlugin {
             Update,
             update_player_sprite.run_if(in_state(GameState::Ready)),
         );
+        app.add_systems(Update, update_slash.run_if(in_state(GameState::Ready)));
         //app.add_systems(Startup, spawn_player)
         //    .add_systems(Update, (update_player, level_up));
     }
@@ -32,11 +33,14 @@ impl Plugin for PlayerPlugin {
 #[derive(Component)]
 pub struct Player;
 
+#[derive(Component)]
+pub struct Slash(Timer);
+
 #[derive(Component, Deref, DerefMut)]
 pub struct AnimationTimer(Timer);
 
 #[derive(Component)]
-pub struct AttackTimer(Timer);
+pub struct StateTimer(Timer);
 
 #[derive(Component)]
 pub enum AnimationState {
@@ -60,8 +64,8 @@ pub fn spawn_player(
             max: 125,
         },
         AnimationState::Idle,
-        AnimationTimer(Timer::from_seconds(0.2, TimerMode::Repeating)),
-        AttackTimer(Timer::from_seconds(0.5, TimerMode::Repeating)),
+        AnimationTimer(Timer::from_seconds(0.15, TimerMode::Repeating)),
+        StateTimer(Timer::from_seconds(0.3, TimerMode::Once)),
         Xp(0),
         Speed(3.5),
         Unit {
@@ -92,7 +96,7 @@ pub fn update_player(
             &Speed,
             &Unit,
             &mut AnimationState,
-            &mut AttackTimer,
+            &mut StateTimer,
         ),
         Without<Camera>,
     >,
@@ -101,90 +105,113 @@ pub fn update_player(
     colliders: Query<(&Transform, &Collider), (Without<Unit>, Without<Camera>)>,
     input: Res<Input<KeyCode>>,
     time: Res<Time>,
+    mut commands: Commands,
+    assets: Res<MyAssets>,
+    mut sprite_params: Sprite3dParams,
 ) {
     let dtime = time.delta_seconds();
-    for (mut transform, _, speed, unit, mut state, attack_timer) in &mut players {
-        let mut direction = Vec3::ZERO;
-        if input.pressed(KeyCode::W) {
-            direction.z -= 1.;
-            // transform.rotate(Quat::from_rotation_y(2. * std::f32::consts::PI * dtime));
-        }
-        if input.pressed(KeyCode::S) {
-            direction.z += 1.;
-        }
-        if input.pressed(KeyCode::D) {
-            direction.x += 1.;
-            transform.rotation = Quat::from_xyzw(0., 1., 0., 0.);
-        }
-        if input.pressed(KeyCode::A) {
-            direction.x -= 1.;
-            transform.rotation = Quat::from_xyzw(0., 0., 0., 1.);
-        }
-        if input.just_pressed(KeyCode::Y) {
-            settings.camera_locked = !settings.camera_locked;
-        }
+    let (mut transform, _, speed, unit, mut state, mut state_timer) = players.single_mut();
+    let mut direction = Vec3::ZERO;
+    if input.pressed(KeyCode::W) {
+        direction.z -= 1.;
+    }
+    if input.pressed(KeyCode::S) {
+        direction.z += 1.;
+    }
+    if input.pressed(KeyCode::D) {
+        direction.x += 1.;
+        transform.rotation = Quat::from_xyzw(0., 1., 0., 0.);
+    }
+    if input.pressed(KeyCode::A) {
+        direction.x -= 1.;
+        transform.rotation = Quat::from_xyzw(0., 0., 0., 1.);
+    }
+    if input.just_pressed(KeyCode::Y) {
+        settings.camera_locked = !settings.camera_locked;
+    }
 
-        // detect changes in X-axis movement
-        if matches!(*state, AnimationState::Attacking) {
-            continue;
-        }
+    // detect changes in X-axis movement
+    if !matches!(*state, AnimationState::Attacking) {
         if direction == Vec3::ZERO {
             *state = AnimationState::Idle;
         } else {
             *state = AnimationState::Moving;
         }
-        let direction = direction.normalize_or_zero();
+    }
 
-        if input.just_pressed(KeyCode::E) && attack_timer.0.elapsed_secs() == 0.0 {
-            info!("Test");
-            *state = AnimationState::Attacking;
-            // do attacking
-        } else {
-            unit.move_and_slide(&mut transform, direction, speed, &colliders, dtime);
-        }
-        // move camera on top of player
-        if settings.camera_locked || input.pressed(KeyCode::Space) {
-            for (_, mut camera_transform) in &mut camera {
-                camera_transform.translation = transform.translation + CAMERA_OFFSET;
+    // if pressed attack key and not currently attacking
+    if input.just_pressed(KeyCode::E) && !matches!(*state, AnimationState::Attacking) {
+        *state = AnimationState::Attacking;
+        *state_timer = StateTimer(Timer::from_seconds(0.3, TimerMode::Once));
+        commands.spawn((
+            Slash(Timer::from_seconds(0.3, TimerMode::Once)),
+            Unit {
+                size: Vec2::new(0.5, 0.5),
+            },
+            AtlasSprite3d {
+                atlas: assets.slash.clone(),
+                pixels_per_metre: 16.0,
+                index: 0 as usize,
+                unlit: true,
+                transform: Transform {
+                    translation: transform.translation + transform.left() * 1.5,
+                    ..*transform
+                },
+                ..default()
             }
+            .bundle(&mut sprite_params),
+        ));
+        // do attacking stuff
+    }
+
+    let direction = direction.normalize_or_zero();
+
+    unit.move_and_slide(&mut transform, direction, speed, &colliders, dtime);
+
+    // move camera on top of player
+    if settings.camera_locked || input.pressed(KeyCode::Space) {
+        for (_, mut camera_transform) in &mut camera {
+            camera_transform.translation = transform.translation + CAMERA_OFFSET;
         }
     }
 }
 
 pub fn update_player_sprite(
-    mut players: Query<(
-        &Player,
-        &mut AnimationState,
-        &mut AtlasSprite3dComponent,
-        &mut AnimationTimer,
-        &mut AttackTimer,
-    )>,
+    mut players: Query<
+        (
+            &mut AnimationState,
+            &mut StateTimer,
+            &mut AtlasSprite3dComponent,
+            &mut AnimationTimer,
+        ),
+        With<Player>,
+    >,
     time: Res<Time>,
 ) {
-    for (_, mut state, mut atlas, mut timer, mut attack_timer) in &mut players {
-        timer.tick(time.delta());
-        if !timer.just_finished() {
-            continue;
+    let (mut state, mut state_timer, mut atlas, mut timer) = players.single_mut();
+    timer.tick(time.delta());
+
+    match *state {
+        AnimationState::Idle => {
+            if timer.just_finished() {
+                atlas.index = (atlas.index + 1) % 2;
+            }
         }
-        match *state {
-            AnimationState::Idle => atlas.index = (atlas.index + 1) % 2,
-            AnimationState::Moving => {
+        AnimationState::Moving => {
+            if timer.just_finished() {
                 atlas.index = (atlas.index + 1) % 4 + 4;
             }
-            AnimationState::Attacking => {
-                if atlas.index == 2 {
-                    atlas.index = 3;
-                } else {
-                    atlas.index = 2;
-                }
-                attack_timer.0.tick(time.delta());
-                if timer.just_finished() {
-                    *state = AnimationState::Idle;
-                    attack_timer.0.reset();
-                }
+        }
+        AnimationState::Attacking => {
+            state_timer.0.tick(time.delta());
+            if timer.0.just_finished() {
+                atlas.index = if atlas.index == 2 { 3 } else { 2 };
+            }
+            if state_timer.0.finished() {
+                *state = AnimationState::Idle;
             }
         }
-    }
+    };
 }
 
 fn level_up(
@@ -197,6 +224,21 @@ fn level_up(
             health.max += 25;
             health.current = health.max;
             speed.0 += 10.0;
+        }
+    }
+}
+
+fn update_slash(mut commands: Commands,mut slashes: Query<(Entity, &mut Slash, &mut AtlasSprite3dComponent)>, time: Res<Time>) {
+
+    for (entity, mut slash, mut atlas) in &mut slashes {
+        slash.0.tick(time.delta());
+        if slash.0.finished() {
+            if atlas.index == 1 {
+                commands.entity(entity).despawn();
+            } else {
+                slash.0.reset();
+                atlas.index += 1;
+            }
         }
     }
 }

@@ -3,7 +3,7 @@ use std::f32::consts::FRAC_PI_2;
 use crate::*;
 
 use super::collider::*;
-use bevy::prelude::{shape::Quad, *};
+use bevy::{prelude::{shape::Quad, *}, ecs::system::EntityCommands};
 use bevy_sprite3d::*;
 use rand::Rng;
 
@@ -13,6 +13,18 @@ pub struct WorldPlugin;
 pub enum TileType {
     Grass,
     Water,
+}
+
+const CHUNK_RADIUS: i32 = 32;
+const CHUNK_SIDE: i32 = CHUNK_RADIUS * 2 + 1;
+
+struct ChunkData {
+    tiles : [[i32; CHUNK_SIDE as usize]; CHUNK_SIDE as usize],
+}
+
+#[derive (Resource)]
+struct WorldData {
+    chunks : bevy::utils::HashMap<(i32, i32), ChunkData>,
 }
 
 impl Plugin for WorldPlugin {
@@ -27,8 +39,8 @@ pub fn spawn_tiles(
     assets: Res<MyAssets>,
     mut sprite_params: Sprite3dParams,
 ) {
-    for i in -10..=10 {
-        for j in -10..=10 {
+    for i in -CHUNK_RADIUS..=CHUNK_RADIUS {
+        for j in -CHUNK_RADIUS..=CHUNK_RADIUS {
             let mut rng = rand::thread_rng();
 
             if rng.gen::<i32>() % 10 != 0 {

@@ -16,3 +16,6 @@ Cargo.lock
 .vscode/
 assets/grass.png~
 assets/water.png~
+
+assets/*.aseprite
+assets/*.png~

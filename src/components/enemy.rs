@@ -54,7 +54,7 @@ pub fn spawn_enemy(
         Damage(10),
         Cooldown(Timer::from_seconds(0.5, TimerMode::Repeating)),
         Sprite3d {
-            image: assets.player.clone(),
+            image: assets.fish_man.clone(),
             pixels_per_metre: 16.0,
             unlit: true,
             transform: Transform::from_xyz(20., 1., 20.),

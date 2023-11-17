@@ -12,7 +12,7 @@ use bevy_inspector_egui::quick::WorldInspectorPlugin;
 use bevy_prototype_lyon::prelude::*;
 use bevy_sprite3d::*;
 use components::unit::Health;
-use components::{bun::*, enemy::*, player::*, shop::*, ui::*, world::*};
+use components::{enemy::*, player::*, shop::*, ui::*, world::*};
 
 #[derive(States, Hash, Clone, PartialEq, Eq, Debug, Default, Reflect)]
 enum GameState {
@@ -38,9 +38,15 @@ struct MyAssets {
 
     #[asset(path = "cart.png")]
     cart: Handle<Image>,
+    #[asset(path = "fish_man.png")]
+    fish_man: Handle<Image>,
     #[asset(texture_atlas(tile_size_x = 32., tile_size_y = 32., columns = 8, rows = 1))]
     #[asset(path = "player_sheet.png")]
     player_moving: Handle<TextureAtlas>,
+    #[asset(texture_atlas(tile_size_x = 32., tile_size_y = 32., columns = 2, rows = 1))]
+    #[asset(path = "slash_sheet.png")]
+    slash: Handle<TextureAtlas>,
+
 }
 
 fn main() {
