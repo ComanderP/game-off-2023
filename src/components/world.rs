@@ -3,7 +3,10 @@ use std::f32::consts::FRAC_PI_2;
 use crate::*;
 
 use super::collider::*;
-use bevy::{prelude::{shape::Quad, *}, ecs::system::EntityCommands};
+use bevy::{
+    ecs::system::EntityCommands,
+    prelude::{shape::Quad, *},
+};
 use bevy_sprite3d::*;
 use rand::Rng;
 
@@ -19,12 +22,12 @@ const CHUNK_RADIUS: i32 = 32;
 const CHUNK_SIDE: i32 = CHUNK_RADIUS * 2 + 1;
 
 struct ChunkData {
-    tiles : [[i32; CHUNK_SIDE as usize]; CHUNK_SIDE as usize],
+    tiles: [[i32; CHUNK_SIDE as usize]; CHUNK_SIDE as usize],
 }
 
-#[derive (Resource)]
+#[derive(Resource)]
 struct WorldData {
-    chunks : bevy::utils::HashMap<(i32, i32), ChunkData>,
+    chunks: bevy::utils::HashMap<(i32, i32), ChunkData>,
 }
 
 impl Plugin for WorldPlugin {
