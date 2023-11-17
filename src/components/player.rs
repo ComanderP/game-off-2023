@@ -22,7 +22,10 @@ impl Plugin for PlayerPlugin {
         app.add_systems(OnEnter(GameState::Spawning), spawn_player);
         app.add_systems(Update, update_player.run_if(in_state(GameState::Ready)));
         app.add_systems(Update, update_slash.run_if(in_state(GameState::Ready)));
-        app.add_systems(Update, update_player_sprite.run_if(in_state(GameState::Ready)));
+        app.add_systems(
+            Update,
+            update_player_sprite.run_if(in_state(GameState::Ready)),
+        );
         //app.add_systems(Startup, spawn_player)
         //    .add_systems(Update, (update_player, level_up));
     }
@@ -95,14 +98,17 @@ pub fn update_player(
             &Unit,
             &mut AnimationState,
             &mut StateTimer,
-            &Damage
+            &Damage,
         ),
         (Without<Camera>, Without<Enemy>),
     >,
     mut camera: Query<(&Camera, &mut Transform)>,
     mut settings: ResMut<PlayerSettings>,
     colliders: Query<(&Transform, &Collider), (Without<Unit>, Without<Camera>)>,
-    mut enemies: Query<(&Enemy, &mut Health, &mut Transform), (Without<Player>, Without<Collider>, Without<Camera>)>,
+    mut enemies: Query<
+        (&Enemy, &mut Health, &mut Transform),
+        (Without<Player>, Without<Collider>, Without<Camera>),
+    >,
     input: Res<Input<KeyCode>>,
     time: Res<Time>,
     mut commands: Commands,
@@ -187,7 +193,6 @@ pub fn update_player(
                 knockback_enemy(&mut enemy_transform, player_transform);
             }
         }
-
     }
 
     let direction = direction.normalize_or_zero();
@@ -253,7 +258,6 @@ fn level_up(
         }
     }
 }
-
 
 fn knockback_enemy(enemy_transform: &mut Transform, player_transform: &Transform) {
     let direction = enemy_transform.translation - player_transform.translation;
