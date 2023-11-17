@@ -21,11 +21,8 @@ impl Plugin for PlayerPlugin {
         });
         app.add_systems(OnEnter(GameState::Spawning), spawn_player);
         app.add_systems(Update, update_player.run_if(in_state(GameState::Ready)));
-        app.add_systems(
-            Update,
-            (update_player_sprite, swipe_attack).run_if(in_state(GameState::Ready)),
-        );
         app.add_systems(Update, update_slash.run_if(in_state(GameState::Ready)));
+        app.add_systems(Update, update_player_sprite.run_if(in_state(GameState::Ready)));
         //app.add_systems(Startup, spawn_player)
         //    .add_systems(Update, (update_player, level_up));
     }
@@ -98,12 +95,14 @@ pub fn update_player(
             &Unit,
             &mut AnimationState,
             &mut StateTimer,
+            &Damage
         ),
-        Without<Camera>,
+        (Without<Camera>, Without<Enemy>),
     >,
     mut camera: Query<(&Camera, &mut Transform)>,
     mut settings: ResMut<PlayerSettings>,
     colliders: Query<(&Transform, &Collider), (Without<Unit>, Without<Camera>)>,
+    mut enemies: Query<(&Enemy, &mut Health, &mut Transform), (Without<Player>, Without<Collider>, Without<Camera>)>,
     input: Res<Input<KeyCode>>,
     time: Res<Time>,
     mut commands: Commands,
@@ -111,7 +110,7 @@ pub fn update_player(
     mut sprite_params: Sprite3dParams,
 ) {
     let dtime = time.delta_seconds();
-    let (mut transform, _, speed, unit, mut state, mut state_timer) = players.single_mut();
+    let (mut transform, _, speed, unit, mut state, mut state_timer, damage) = players.single_mut();
     let mut direction = Vec3::ZERO;
     if input.pressed(KeyCode::W) {
         direction.z -= 1.;
@@ -163,6 +162,32 @@ pub fn update_player(
             .bundle(&mut sprite_params),
         ));
         // do attacking stuff
+
+        for (_, mut enemy_health, mut enemy_transform) in enemies.iter_mut() {
+            let player_transform = &(*transform);
+
+            let player_direction = player_transform.rotation.mul_vec3(Vec3::new(-1., 0., 0.));
+            info!("Player direction: {}", player_direction);
+
+            let distance_to_enemy = enemy_transform.translation - player_transform.translation;
+            info!("Distance to enemey: {}", distance_to_enemy);
+
+            let angle = player_direction.dot(distance_to_enemy.normalize_or_zero());
+            info!("Angle: {}", angle);
+
+            if angle > 0.5 && distance_to_enemy.length() < 3.0 {
+                let player_damage = damage.0;
+                info!("Damage!");
+                if enemy_health.current < player_damage {
+                    info!("Enemy dead!");
+                    enemy_health.current = 0;
+                } else {
+                    enemy_health.current -= player_damage;
+                }
+                knockback_enemy(&mut enemy_transform, player_transform);
+            }
+        }
+
     }
 
     let direction = direction.normalize_or_zero();
@@ -229,39 +254,6 @@ fn level_up(
     }
 }
 
-fn swipe_attack(
-    player: Query<(&Player, &Transform, &Damage)>,
-    mut enemies: Query<(&Enemy, &mut Health, &mut Transform), Without<Player>>,
-    input: Res<Input<KeyCode>>,
-) {
-    let player = player.single();
-    if input.just_pressed(KeyCode::Space) {
-        for (_, mut enemy_health, mut enemy_transform) in enemies.iter_mut() {
-            let player_transform = player.1;
-
-            let player_direction = player_transform.rotation.mul_vec3(Vec3::new(-1., 0., 0.));
-            info!("Player direction: {}", player_direction);
-
-            let distance_to_enemy = enemy_transform.translation - player_transform.translation;
-            info!("Distance to enemey: {}", distance_to_enemy);
-
-            let angle = player_direction.dot(distance_to_enemy.normalize_or_zero());
-            info!("Angle: {}", angle);
-
-            if angle > 0.5 && distance_to_enemy.length() < 3.0 {
-                let player_damage = player.2 .0;
-                info!("Damage!");
-                if enemy_health.current < player_damage {
-                    info!("Enemy dead!");
-                    enemy_health.current = 0;
-                } else {
-                    enemy_health.current -= player_damage;
-                }
-                knockback_enemy(&mut enemy_transform, player_transform);
-            }
-        }
-    }
-}
 
 fn knockback_enemy(enemy_transform: &mut Transform, player_transform: &Transform) {
     let direction = enemy_transform.translation - player_transform.translation;
