@@ -38,9 +38,7 @@ struct MyAssets {
 
     #[asset(path = "cart.png")]
     cart: Handle<Image>,
-    #[asset(path = "fisherman_still.png")]
-    player_idle: Handle<Image>,
-    #[asset(texture_atlas(tile_size_x = 32., tile_size_y = 32., columns = 10, rows = 1))]
+    #[asset(texture_atlas(tile_size_x = 32., tile_size_y = 32., columns = 8, rows = 1))]
     #[asset(path = "player_sheet.png")]
     player_moving: Handle<TextureAtlas>,
 }

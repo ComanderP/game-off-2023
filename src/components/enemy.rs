@@ -22,6 +22,7 @@ impl Plugin for EnemyPlugin {
             );
     }
 }
+
 #[derive(Component)]
 pub struct Enemy;
 
