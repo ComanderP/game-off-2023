@@ -46,7 +46,6 @@ struct MyAssets {
     #[asset(texture_atlas(tile_size_x = 32., tile_size_y = 32., columns = 2, rows = 1))]
     #[asset(path = "slash_sheet.png")]
     slash: Handle<TextureAtlas>,
-
 }
 
 fn main() {

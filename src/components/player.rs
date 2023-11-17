@@ -269,8 +269,11 @@ fn knockback_enemy(enemy_transform: &mut Transform, player_transform: &Transform
     enemy_transform.translation += direction
 }
 
-fn update_slash(mut commands: Commands,mut slashes: Query<(Entity, &mut Slash, &mut AtlasSprite3dComponent)>, time: Res<Time>) {
-
+fn update_slash(
+    mut commands: Commands,
+    mut slashes: Query<(Entity, &mut Slash, &mut AtlasSprite3dComponent)>,
+    time: Res<Time>,
+) {
     for (entity, mut slash, mut atlas) in &mut slashes {
         slash.0.tick(time.delta());
         if slash.0.finished() {
