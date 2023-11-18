@@ -1,30 +1,18 @@
-use crate::*;
-
-use super::player::*;
-use super::unit::*;
 use bevy::prelude::*;
-pub struct UIPlugin;
 
-impl Plugin for UIPlugin {
-    fn build(&self, app: &mut App) {
-        app.add_systems(OnEnter(GameState::Spawning), load_ui)
-            .add_systems(Update, update_ui.run_if(in_state(GameState::Ready)));
-    }
-}
+use crate::entities::player::components::*;
+use crate::entities::unit::*;
 
-#[derive(Component)]
-enum PlayerStat {
-    Health,
-    Experience,
-    Speed,
-}
+use super::components::*;
 
 #[derive(Bundle)]
-pub struct HealthBar {
+pub struct HealthBar
+{
     pub text: Text2dBundle,
 }
 
-fn load_ui(mut commands: Commands) {
+pub fn load_ui(mut commands: Commands)
+{
     commands
         .spawn(NodeBundle {
             style: Style {
@@ -67,20 +55,26 @@ fn load_ui(mut commands: Commands) {
         });
 }
 
-fn update_ui(
+pub fn update_ui(
     query: Query<(&Health, &Xp, &Speed), With<Player>>,
     mut stats: Query<(&mut Text, &PlayerStat)>,
-) {
+)
+{
     let (health, xp, speed) = query.single();
-    for (mut text, stat) in stats.iter_mut() {
-        match stat {
-            PlayerStat::Experience => {
+    for (mut text, stat) in stats.iter_mut()
+    {
+        match stat
+        {
+            PlayerStat::Experience =>
+            {
                 *text = Text::from_section(format!("Exp: {}/{}", xp.0, 1000), TextStyle::default())
             }
-            PlayerStat::Speed => {
+            PlayerStat::Speed =>
+            {
                 *text = Text::from_section(format!("Speed: {}", speed.0), TextStyle::default())
             }
-            PlayerStat::Health => {
+            PlayerStat::Health =>
+            {
                 *text = Text::from_section(
                     format!("Health: {}/{}", health.current, health.max),
                     TextStyle::default(),

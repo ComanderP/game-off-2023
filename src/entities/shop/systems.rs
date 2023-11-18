@@ -1,30 +1,22 @@
-use crate::*;
-
-use super::collider::*;
-use super::unit::*;
 use bevy::prelude::*;
+use bevy_health_bar3d::configuration::*;
 use bevy_sprite3d::Sprite3d;
 use bevy_sprite3d::Sprite3dParams;
 use rand::Rng;
-pub struct ShopPlugin;
 
-impl Plugin for ShopPlugin {
-    fn build(&self, app: &mut App) {
-        app.add_systems(OnEnter(GameState::Spawning), spawn_merchant);
-        app.add_systems(Update, update_merchant.run_if(in_state(GameState::Ready)));
-    }
-}
-#[derive(Component)]
-pub struct Merchant;
+use crate::assets::MyAssets;
+use crate::entities::collider::Collider;
+use crate::entities::unit::*;
 
-#[derive(Component)]
-pub struct Cart;
+use super::components::*;
+use super::resources::*;
 
 pub fn spawn_merchant(
     mut commands: Commands,
     assets: Res<MyAssets>,
     mut sprite_params: Sprite3dParams,
-) {
+)
+{
     let mut rng = rand::thread_rng();
     let cx = rng.gen::<i32>() % 10 - 5;
     let cy = rng.gen::<i32>() % 10 - 5;
@@ -80,9 +72,11 @@ pub fn update_merchant(
     mut merchants: Query<(&mut Transform, &Merchant, &Speed, &Unit), Without<Camera>>,
     colliders: Query<(&Transform, &Collider), (Without<Unit>, Without<Camera>)>,
     time: Res<Time>,
-) {
+)
+{
     let dtime = time.delta_seconds();
-    for (mut transform, _, speed, unit) in &mut merchants {
+    for (mut transform, _, speed, unit) in &mut merchants
+    {
         let mut rng = rand::thread_rng();
         // let direction = Vec3::new(rng.gen::<i32>() as f32, 0., rng.gen::<i32>() as f32);
         // let direction = direction.normalize_or_zero();
