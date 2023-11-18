@@ -19,6 +19,10 @@ impl Plugin for WorldPlugin
     fn build(&self, app: &mut App)
     {
         app.add_systems(OnEnter(GameState::Ready), spawn_tiles)
-            .add_systems(Update, update_tiles);
+            .add_systems(Update, update_tiles)
+            .add_systems(
+                Update,
+                spawn_tiles_around_player.run_if(in_state(GameState::Ready)),
+            );
     }
 }

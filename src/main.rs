@@ -38,8 +38,8 @@ fn main()
         .add_plugins(DefaultPlugins.set(ImagePlugin::default_nearest()))
         .add_plugins(HealthBarPlugin::<Health>::default())
         // Show diagnostics in console
-        .add_plugins(LogDiagnosticsPlugin::default())
-        .add_plugins(FrameTimeDiagnosticsPlugin::default())
+        // .add_plugins(LogDiagnosticsPlugin::default())
+        // .add_plugins(FrameTimeDiagnosticsPlugin::default())
         //.add_plugins(ShapePlugin) // plugin for drawing shapes on screen
         .add_plugins(Sprite3dPlugin)
         // define initial gamestate
@@ -57,8 +57,8 @@ fn main()
         .add_systems(OnEnter(GameState::Ready), game_setup)
         // systems that rely on the player being spawned should: run_if(in_state(GameState::Ready))
         .add_plugins(WorldInspectorPlugin::new())
-        // handle spawning and updating game components
         .add_plugins(PlayerPlugin)
+        // handle spawning and updating game components
         .add_plugins(EnemyPlugin)
         .add_plugins(WorldPlugin)
         .add_plugins(ShopPlugin)

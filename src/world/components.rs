@@ -1,6 +1,6 @@
 use bevy::prelude::*;
 
-#[derive(Component)]
+#[derive(Component, Clone, Copy, PartialEq)]
 pub enum TileType
 {
     Grass,
