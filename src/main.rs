@@ -17,7 +17,7 @@ use assets::MyAssets;
 use entities::enemy::EnemyPlugin;
 use entities::player::PlayerPlugin;
 use entities::shop::ShopPlugin;
-use entities::unit::Health;
+use entities::unit::{Health, Speed};
 use ui::UIPlugin;
 use world::WorldPlugin;
 
@@ -34,6 +34,7 @@ fn main()
 {
     App::new()
         .insert_resource(Msaa::Off)
+        .register_type::<Speed>()
         .register_type::<Health>()
         .add_plugins(DefaultPlugins.set(ImagePlugin::default_nearest()))
         .add_plugins(HealthBarPlugin::<Health>::default())
