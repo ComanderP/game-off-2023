@@ -1,3 +1,5 @@
+use std::f32::consts::E;
+
 use bevy::prelude::*;
 use bevy_health_bar3d::prelude::*;
 use bevy_sprite3d::Sprite3d;
@@ -12,8 +14,11 @@ use super::resources::*;
 
 use crate::entities::unit::*;
 
-pub fn spawn_enemy(mut commands: Commands, assets: Res<MyAssets>, mut sprite_params: Sprite3dParams)
-{
+pub fn spawn_enemy(
+    mut commands: Commands,
+    assets: Res<MyAssets>,
+    mut sprite_params: Sprite3dParams,
+) {
     commands.spawn((
         Enemy,
         Health {
@@ -44,19 +49,23 @@ pub fn spawn_enemy(mut commands: Commands, assets: Res<MyAssets>, mut sprite_par
 }
 
 pub fn update_enemy(
-    mut enemies: Query<(&mut Transform, &Enemy, &Speed, &Unit), Without<Camera>>,
+    mut commands: Commands,
+    mut enemies: Query<(Entity, &mut Transform, &Enemy, &Speed, &Unit, &Health)>,
     colliders: Query<(&Transform, &Collider), (Without<Unit>, Without<Camera>)>,
     players: Query<(&mut Transform, &Player), (Without<Enemy>, Without<Camera>, Without<Collider>)>,
     time: Res<Time>,
-)
-{
+) {
     let dtime = time.delta_seconds();
     let player = players.single();
-    for (mut transform, _, speed, unit) in &mut enemies
-    {
+    for (entity, mut transform, _, speed, unit, health) in &mut enemies {
+        if health.current == 0 {
+            commands.entity(entity).remove::<Health>();
+            // commands.entity(entity).despawn();
+            continue;
+        }
+
         let direction = player.0.translation - transform.translation;
-        if direction.length() <= 1.0
-        {
+        if direction.length() <= 1.0 {
             continue;
         }
         let direction = direction.normalize_or_zero();
@@ -64,28 +73,27 @@ pub fn update_enemy(
     }
 }
 
+pub fn kill_enemies(    mut commands: Commands,mut enemies: Query<(Entity, &Enemy), Without<Health>>) {
+    for (entity, _) in &mut enemies {
+        commands.entity(entity).despawn();
+    }
+}
+
 pub fn deal_damage(
     mut enemies: Query<(&mut Transform, &Enemy, &MeleeRange, &Damage, &mut Cooldown)>,
     mut players: Query<(&mut Transform, &Player, &mut Health), Without<Enemy>>,
     time: Res<Time>,
-)
-{
+) {
     let mut player = players.single_mut();
-    for (transform, _, range, damage, mut cooldown) in &mut enemies
-    {
-        if player.0.translation.distance(transform.translation) <= range.0
-        {
+    for (transform, _, range, damage, mut cooldown) in &mut enemies {
+        if player.0.translation.distance(transform.translation) <= range.0 {
             cooldown.0.tick(time.delta());
-            if !cooldown.0.just_finished()
-            {
+            if !cooldown.0.just_finished() {
                 continue;
             }
-            if player.2.current > damage.0
-            {
+            if player.2.current > damage.0 {
                 player.2.current -= damage.0;
-            }
-            else
-            {
+            } else {
                 player.2.current = 0;
             }
             info!("Player hit")

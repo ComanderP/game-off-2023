@@ -146,7 +146,7 @@ fn add_chunk(world_data: &mut ResMut<'_, WorldData>, chunk_coords: (i32, i32), i
     }
 }
 
-fn get_chunk_pos(player_pos: Vec2) -> (i32, i32) {
+pub fn get_chunk_pos(player_pos: Vec2) -> (i32, i32) {
     let mut x = player_pos.x as i32;
     let mut y = player_pos.y as i32;
 
@@ -194,7 +194,7 @@ fn spawn_chunk(
                     tile_bundle,
                     Collider {
                         size: Vec2::new(2., 2.),
-                        active: false,
+                        active: true,
                     },
                 )),
             };

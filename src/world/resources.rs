@@ -46,7 +46,6 @@ impl Generate for Chunk
             {
                 // random gen
                 let value = map.get_value((translate.x * CHUNK_SIDE as f32 + i as f32 + MAP_SIDE as f32 * 1000.) as usize % MAP_SIDE,( translate.y  * CHUNK_SIDE as f32 + j as f32 + MAP_SIDE as f32 * 1000.) as usize % MAP_SIDE);
-                info!("{}, {} -> {}", (translate.x * CHUNK_SIDE as f32 + i as f32 + MAP_SIDE as f32 * 1000.) as usize % MAP_SIDE, ( translate.y  * CHUNK_SIDE as f32 + j as f32 + MAP_SIDE as f32 * 1000.) as usize % MAP_SIDE, value);
                 if value < 0.0
                 {
                     tiles[i as usize][j as usize] = TileType::Water;

@@ -23,6 +23,9 @@ impl Plugin for PlayerPlugin
         app.add_systems(OnEnter(GameState::Spawning), spawn_player);
         app.add_systems(Update, update_player.run_if(in_state(GameState::Ready)));
         app.add_systems(Update, update_slash.run_if(in_state(GameState::Ready)));
+        app.add_systems(Update, update_fishing_float.run_if(in_state(GameState::Ready)));
+        app.add_systems(Update, catch_fish.run_if(in_state(GameState::Ready)));
+        app.add_systems(Update, level_up.run_if(in_state(GameState::Ready)));
         app.add_systems(
             Update,
             update_player_sprite.run_if(in_state(GameState::Ready)),

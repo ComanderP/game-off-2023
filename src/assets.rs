@@ -24,4 +24,7 @@ pub struct MyAssets
     #[asset(texture_atlas(tile_size_x = 32., tile_size_y = 32., columns = 2, rows = 1))]
     #[asset(path = "slash_sheet.png")]
     pub slash: Handle<TextureAtlas>,
+    #[asset(texture_atlas(tile_size_x = 32., tile_size_y = 32., columns = 5, rows = 1))]
+    #[asset(path = "fishing_float.png")]
+    pub float: Handle<TextureAtlas>,
 }

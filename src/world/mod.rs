@@ -7,10 +7,11 @@ use noise::core::perlin::perlin_2d;
 use noise::permutationtable::PermutationTable;
 use noise::utils::{NoiseMapBuilder, PlaneMapBuilder};
 use noise::{Abs, Curve, Cylinders, Fbm, NoiseFn, Perlin, ScalePoint};
+use rand::RngCore;
 
 pub mod components;
-mod resources;
-mod systems;
+pub mod resources;
+pub mod systems;
 
 use self::resources::*;
 use self::systems::*;
@@ -23,7 +24,8 @@ pub struct WorldPlugin;
 
 impl Plugin for WorldPlugin {
     fn build(&self, app: &mut App) {
-        let perlin = Perlin::default();
+        let mut rng = rand::thread_rng();
+        let perlin = Perlin::new(rng.next_u32());
         let hasher = PermutationTable::new(0);
 
         app.insert_resource(WorldData {
