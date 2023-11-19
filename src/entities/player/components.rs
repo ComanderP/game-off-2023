@@ -18,6 +18,8 @@ pub enum AnimationState
     Idle,
     Moving,
     Attacking,
+    FishingCharging,
+    Fishing,
 }
 
 #[derive(Component)]

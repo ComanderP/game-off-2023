@@ -349,16 +349,16 @@ pub fn deload_chunks(
 
     for (chunk_pos, chunk) in world_data.chunks.iter_mut()
     {
-        // if
-        // {
-        //     // Remove the chunk
-        //     let tiles = get_chunk_tiles(*chunk_pos, &mut entities);
-        //     for tile in tiles
-        //     {
-        //         commands.entity(tile).despawn_recursive();
-        //     }
-        //     chunk.set_is_loaded(false);
-        // }
+        if ((chunk_pos.0 - chunk_coords.0).abs() > 2 || (chunk_pos.1 - chunk_coords.1).abs() > 2 ) && chunk.is_loaded() {
+            // Remove the chunk
+            let tiles = get_chunk_tiles(*chunk_pos, &mut entities);
+            for tile in tiles
+            {
+
+                commands.entity(tile).despawn();
+            }
+            chunk.set_is_loaded(false);
+        }
     }
 }
 

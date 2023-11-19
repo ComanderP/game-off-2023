@@ -83,13 +83,9 @@ pub fn update_player(
 
     let direction = get_direction_vector(&input, &mut transform);
 
-    if input.just_pressed(KeyCode::Y)
-    {
-        settings.camera_locked = !settings.camera_locked;
-    }
 
     // detect changes in X-axis movement
-    update_animation_state(&mut state, direction);
+    update_movement_state(&mut state, direction);
 
     // if pressed attack key and not currently attacking
     if input.just_pressed(KeyCode::E) && !matches!(*state, AnimationState::Attacking)
@@ -119,12 +115,34 @@ pub fn update_player(
         attack_enemy(enemies, &transform, damage);
     }
 
+    if input.pressed(KeyCode::F) {
+        // already charging 
+        if matches!(*state, AnimationState::FishingCharging) {
+            state_timer.0.tick(time.delta());
+        } else {
+            // start charging
+            *state_timer = StateTimer(Timer::from_seconds(1.0, TimerMode::Once));
+            *state = AnimationState::FishingCharging;
+        }
+    } else {
+        if matches!(*state, AnimationState::FishingCharging) {
+            info!("Charged for {}", state_timer.0.elapsed_secs());
+            *state = AnimationState::Fishing;
+        }
+    }
+
+    if input.pressed(KeyCode::Space) {
+        if matches!(*state, AnimationState::Fishing) {
+            *state = AnimationState::Idle;
+        }
+    }
+
     let direction = direction.normalize_or_zero();
 
     unit.move_and_slide(&mut transform, direction, speed, &colliders, dtime);
 
     // move camera on top of player
-    if settings.camera_locked || input.pressed(KeyCode::Space)
+    if settings.camera_locked
     {
         for (_, mut camera_transform) in &mut camera
         {
@@ -199,9 +217,9 @@ fn get_direction_vector(input: &Input<KeyCode>, transform: &mut Transform) -> Ve
     direction
 }
 
-fn update_animation_state(state: &mut AnimationState, direction: Vec3)
+fn update_movement_state(state: &mut AnimationState, direction: Vec3)
 {
-    if !matches!(*state, AnimationState::Attacking)
+    if matches!(*state, AnimationState::Moving) || matches!(*state, AnimationState::Idle)
     {
         if direction == Vec3::ZERO
         {
@@ -258,6 +276,8 @@ pub fn update_player_sprite(
                 *state = AnimationState::Idle;
             }
         }
+        AnimationState::FishingCharging => atlas.index = 0,
+        AnimationState::Fishing => atlas.index = 1,
     };
 }
 

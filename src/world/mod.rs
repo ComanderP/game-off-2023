@@ -23,6 +23,7 @@ impl Plugin for WorldPlugin
             chunks: HashMap::default(),
         })
         .add_systems(OnEnter(GameState::Ready), spawn_tiles_around_player)
-        .add_systems(Update, update_tiles.run_if(in_state(GameState::Ready)));
+        .add_systems(Update, update_tiles.run_if(in_state(GameState::Ready)))
+        .add_systems(Update, deload_chunks.run_if(in_state(GameState::Ready)));
     }
 }
