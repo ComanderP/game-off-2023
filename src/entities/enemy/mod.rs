@@ -14,13 +14,13 @@ impl Plugin for EnemyPlugin
 {
     fn build(&self, app: &mut App)
     {
-        app.add_systems(OnEnter(GameState::Spawning), spawn_enemy)
-            .add_systems(
-                Update,
-                (
-                    update_enemy.run_if(in_state(GameState::Ready)),
-                    deal_damage.run_if(in_state(GameState::Ready)),
-                ),
-            );
+        // app.add_systems(OnEnter(GameState::Spawning), spawn_enemy)
+        //     .add_systems(
+        //         Update,
+        //         (
+        //             update_enemy.run_if(in_state(GameState::Ready)),
+        //             deal_damage.run_if(in_state(GameState::Ready)),
+        //         ),
+        //     );
     }
 }

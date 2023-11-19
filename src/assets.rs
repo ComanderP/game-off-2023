@@ -12,10 +12,8 @@ pub struct MyAssets
     pub water: Handle<Image>,
     #[asset(path = "grass_var1.png")]
     pub grass: Handle<Image>,
-
     #[asset(path = "feesh_man_sheet.png")]
     pub merchant: Handle<Image>,
-
     #[asset(path = "cart.png")]
     pub cart: Handle<Image>,
     #[asset(path = "fish_man.png")]

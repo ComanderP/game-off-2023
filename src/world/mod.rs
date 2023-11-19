@@ -1,4 +1,5 @@
 use bevy::prelude::*;
+use bevy::utils::HashMap;
 
 use crate::GameState;
 
@@ -9,7 +10,7 @@ mod systems;
 use self::resources::*;
 use self::systems::*;
 
-pub const CHUNK_RADIUS: i32 = 32;
+pub const CHUNK_RADIUS: i32 = 2;
 pub const CHUNK_SIDE: i32 = CHUNK_RADIUS * 2 + 1;
 
 pub struct WorldPlugin;
@@ -18,11 +19,10 @@ impl Plugin for WorldPlugin
 {
     fn build(&self, app: &mut App)
     {
-        app.add_systems(OnEnter(GameState::Ready), spawn_tiles)
-            .add_systems(Update, update_tiles)
-            .add_systems(
-                Update,
-                spawn_tiles_around_player.run_if(in_state(GameState::Ready)),
-            );
+        app.insert_resource(WorldData {
+            chunks: HashMap::default(),
+        })
+        .add_systems(OnEnter(GameState::Ready), spawn_tiles_around_player)
+        .add_systems(Update, update_tiles.run_if(in_state(GameState::Ready)));
     }
 }
