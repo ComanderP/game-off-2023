@@ -1,8 +1,12 @@
+use std::cmp::min;
+
+use crate::GameState;
 use bevy::prelude::*;
 use bevy::utils::HashMap;
-use noise::{Fbm, Perlin};
+use noise::core::perlin::perlin_2d;
+use noise::permutationtable::PermutationTable;
 use noise::utils::{NoiseMapBuilder, PlaneMapBuilder};
-use crate::GameState;
+use noise::{Abs, Curve, Cylinders, Fbm, NoiseFn, Perlin, ScalePoint};
 
 pub mod components;
 mod resources;
@@ -17,20 +21,28 @@ pub const MAP_SIDE: usize = 1000;
 
 pub struct WorldPlugin;
 
-impl Plugin for WorldPlugin
-{
-    fn build(&self, app: &mut App)
-    {
-        let fbm = Fbm::<Perlin>::new(0);
+impl Plugin for WorldPlugin {
+    fn build(&self, app: &mut App) {
+        let perlin = Perlin::default();
+        let hasher = PermutationTable::new(0);
+
         app.insert_resource(WorldData {
             chunks: HashMap::default(),
-            noise_map: PlaneMapBuilder::<_, 2>::new(&fbm)
-            .set_is_seamless(true)
+            // make it so circle around player, yes
+            noise_map: PlaneMapBuilder::<_, 2>::new_fn(
+                |point, _hasher| {
+                    (-((point[0] + 50.).abs().min((point[0] - 50.).abs()).powi(2)
+                        + (point[1] + 50.).abs().min((point[1] - 50.).abs()).powi(2)
+                        - 1.))
+                        .max(perlin.get(point))
+                },
+                &hasher,
+            )
+            .set_is_seamless(false)
             .set_size(MAP_SIDE, MAP_SIDE)
-            .set_x_bounds(-5.0, 5.0)
-            .set_y_bounds(-5.0, 5.0)
-            .build()
-
+            .set_x_bounds(-50.0, 50.0)
+            .set_y_bounds(-50.0, 50.0)
+            .build(),
         })
         .add_systems(OnEnter(GameState::Ready), spawn_tiles_around_player)
         .add_systems(Update, update_tiles.run_if(in_state(GameState::Ready)))
